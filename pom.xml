@@ -36,12 +36,14 @@
 		<maven.target.version>3.2.2</maven.target.version>
 		<maven-test-harness.version>3.3.0</maven-test-harness.version>
 		<shrinkwrap.version>1.2.6</shrinkwrap.version>
+                <slf4j.version>1.7.30</slf4j.version>
 	</properties>
 
 	<modules>
 		<module>org.eclipse.transformer</module>
 		<module>org.eclipse.transformer.cli</module>
 		<module>org.eclipse.transformer.maven</module>
+		<module>org.eclipse.transformer.payara</module>
 	</modules>
 
 	<url>https://projects.eclipse.org/projects/technology.transformer</url>
@@ -330,8 +332,14 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-simple</artifactId>
-				<version>1.7.30</version>
+				<version>${slf4j.version}</version>
 				<scope>runtime</scope>
+			</dependency>
+                        <dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>

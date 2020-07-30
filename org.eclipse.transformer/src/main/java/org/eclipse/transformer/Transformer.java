@@ -354,7 +354,9 @@ public class Transformer {
 	public static Properties loadProperties(String resourceRef) throws IOException {
 		Properties properties = new Properties();
 		try (InputStream inputStream = Transformer.getResourceStream(resourceRef)) {
+                    if(inputStream != null){
 			properties.load(inputStream);
+		}
 		}
 		return properties;
 	}
@@ -977,37 +979,37 @@ public class Transformer {
 				perClassConstantStrings = null;
 				dual_info("Per class constant mapping files are not enabled");
 			}
-			return validateRules(packageRenames, packageVersions);
-		}
+	                return validateRules(packageRenames, packageVersions, invert);
+            }
 
-		protected boolean validateRules(Map<String, String> renamesMap, Map<String, String> versionsMap) {
+                protected boolean validateRules(Map<String, String> renamesMap, Map<String, String> versionsMap, boolean invert) {
 
-			if ((versionsMap == null) || versionsMap.isEmpty()) {
-				return true; // Nothing to validate
-			}
+                if ((versionsMap == null) || versionsMap.isEmpty()) {
+                    return true; // Nothing to validate
+                }
 
-			if ((renamesMap == null) || renamesMap.isEmpty()) {
-				String renamesRef = getRuleFileName(AppOption.RULES_RENAMES);
-				String versionsRef = getRuleFileName(AppOption.RULES_VERSIONS);
+                if ((renamesMap == null) || renamesMap.isEmpty()) {
+                    String renamesRef = getRuleFileName(AppOption.RULES_RENAMES);
+                    String versionsRef = getRuleFileName(AppOption.RULES_VERSIONS);
 
-				if (renamesRef == null) {
-					dual_error("Package version updates were specified in [ " + versionsRef + " ]"
-						+ "but no rename rules were specified.");
-				} else {
-					dual_error("Package version updates were specified in [ " + versionsRef + " ]"
-						+ "but no rename rules were specified in [ " + renamesRef + " ]");
-				}
-				return false;
-			}
+                    if (renamesRef == null) {
+                        dual_error("Package version updates were specified in [ " + versionsRef + " ]"
+                                + "but no rename rules were specified.");
+                    } else {
+                        dual_error("Package version updates were specified in [ " + versionsRef + " ]"
+                                + "but no rename rules were specified in [ " + renamesRef + " ]");
+                    }
+                    return false;
+                }
 
-			for (String entry : versionsMap.keySet()) {
-				if (!renamesMap.containsValue(entry)) {
-					dual_error(
-						"Version rule key [ " + entry + "]" + " from [ " + getRuleFileName(AppOption.RULES_VERSIONS)
-							+ " ]" + " not found in rename rules [ " + getRuleFileName(AppOption.RULES_RENAMES) + " ]");
-					return false;
-				}
-			}
+                for (String entry : versionsMap.keySet()) {
+                    if ((!invert && !renamesMap.containsValue(entry)) || (invert && !renamesMap.containsKey(entry))) {
+                        dual_error(
+                                "Version rule key [ " + entry + "]" + " from [ " + getRuleFileName(AppOption.RULES_VERSIONS)
+                                + " ]" + " not found in rename rules [ " + getRuleFileName(AppOption.RULES_RENAMES) + " ]");
+                        return false;
+                    }
+                }
 
 			return true;
 		}
