@@ -17,10 +17,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.eclipse.transformer.action.Action;
 import org.eclipse.transformer.action.ContainerChanges;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class ContainerChangesImpl extends ChangesImpl implements ContainerChanges {
 
@@ -360,16 +361,16 @@ public class ContainerChangesImpl extends ChangesImpl implements ContainerChange
 
 	@Override
 	public void displayVerbose(Logger logger, String inputPath, String outputPath) {
-		if (!logger.isInfoEnabled()) {
+		if (!logger.isLoggable(Level.INFO)) {
 			return;
 		}
 
 		logger.info(DASH_LINE);
 
-		logger.info("[ Input  ] [ {} ]", getInputResourceName());
-		logger.info("           [ {} ]", inputPath);
-		logger.info("[ Output ] [ {} ]", getOutputResourceName());
-		logger.info("           [ {} ]", outputPath);
+		logger.log(Level.INFO, "[ Input  ] [ {} ]", getInputResourceName());
+		logger.log(Level.INFO, "           [ {} ]", inputPath);
+		logger.log(Level.INFO, "[ Output ] [ {} ]", getOutputResourceName());
+		logger.log(Level.INFO, "           [ {} ]", outputPath);
 		logger.info(DASH_LINE);
 
 		logger.info("[ Immediate changes: ]");
@@ -410,17 +411,17 @@ public class ContainerChangesImpl extends ChangesImpl implements ContainerChange
 
 	@Override
 	public void displayTerse(Logger logger, String inputPath, String outputPath) {
-		if (!logger.isInfoEnabled()) {
+		if (!logger.isLoggable(Level.INFO)) {
 			return;
 		}
 
-		if (!inputPath.equals(outputPath)) {
-			if (!inputPath.equals(outputPath)) {
-				logger.info("Input [ {} ] as [ {} ]: {}", inputPath, outputPath, getChangeTag());
-			} else {
-				logger.info("Input [ {} ]: {}", inputPath, getChangeTag());
-			}
-		}
+                if (!inputPath.equals(outputPath)) {
+                    if (!inputPath.equals(outputPath)) {
+                        logger.log(Level.INFO, "Input [ {} ] as [ {} ]: {}", new Object[]{inputPath, outputPath, getChangeTag()});
+                    } else {
+                        logger.log(Level.INFO, "Input [ {} ]: {}", new Object[]{inputPath, getChangeTag()});
+                    }
+                }
 
 		logger.info(formatData("All Resources", getAllResources(), "Unselected", getAllUnselected(), "Selected",
 			getAllSelected(), ""));

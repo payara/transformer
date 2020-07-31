@@ -22,7 +22,7 @@ import org.eclipse.transformer.action.SignatureRule;
 import org.eclipse.transformer.action.SignatureRule.SignatureType;
 import org.eclipse.transformer.util.ByteData;
 import org.eclipse.transformer.util.FileUtils;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import aQute.bnd.classfile.AnnotationDefaultAttribute;
 import aQute.bnd.classfile.AnnotationInfo;
@@ -82,6 +82,7 @@ import aQute.bnd.classfile.builder.ClassFileBuilder;
 import aQute.bnd.classfile.builder.MutableConstantPool;
 import aQute.lib.io.ByteBufferDataInput;
 import aQute.lib.io.ByteBufferDataOutput;
+import java.util.logging.Level;
 
 /**
  * Transform class bytes.
@@ -164,10 +165,10 @@ public class ClassActionImpl extends ActionImpl {
 			outputPath = directOutputPath;
 		}
 
-		logger.error(
+		logger.log(Level.SEVERE,
 			"Approximate relocation of class; case {}:" + " initial class name [ {} ]; final class name [ {} ];"
 				+ " initial resource location [ {} ]; final resource location [ {} ].",
-			relocationCase, inputClassName, outputClassName, inputPath, outputPath);
+			new Object[]{relocationCase, inputClassName, outputClassName, inputPath, outputPath});
 
 		return outputPath;
 	}
@@ -177,7 +178,7 @@ public class ClassActionImpl extends ActionImpl {
 	protected static final int DUMP_WIDTH = 16;
 
 	protected void debugDump(byte[] bytes, int offset, int length) {
-		if (!getLogger().isDebugEnabled()) {
+		if (!getLogger().isLoggable(Level.FINE)) {
 			return;
 		}
 

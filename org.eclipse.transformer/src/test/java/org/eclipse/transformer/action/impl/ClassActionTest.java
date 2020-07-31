@@ -28,9 +28,7 @@ import org.eclipse.transformer.action.Action;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.logging.Logger;
 import aQute.bnd.classfile.Attribute;
 import aQute.bnd.classfile.ClassFile;
 import aQute.bnd.classfile.ElementInfo;
@@ -59,7 +57,7 @@ public class ClassActionTest {
 			+ testInfo.getTestMethod()
 				.map(Method::getName)
 				.get();
-		logger = LoggerFactory.getLogger(testName);
+		logger = Logger.getLogger(testName);
 	}
 
 	<ATTRIBUTE extends Attribute> Stream<ATTRIBUTE> attributes(Class<ATTRIBUTE> attributeType, ElementInfo element) {

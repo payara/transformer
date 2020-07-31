@@ -12,8 +12,9 @@
 package org.eclipse.transformer.action.impl;
 
 import java.io.PrintStream;
+import java.util.logging.Level;
 
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class ServiceLoaderConfigChangesImpl extends ChangesImpl {
 
@@ -70,13 +71,13 @@ public class ServiceLoaderConfigChangesImpl extends ChangesImpl {
 
 	@Override
 	public void displayVerbose(Logger logger, String inputPath, String outputPath) {
-		if (!logger.isInfoEnabled()) {
+		if (!logger.isLoggable(Level.INFO)) {
 			return;
 		}
 
-		logger.info("Input  [ {} ] as [ {} ]", getInputResourceName(), inputPath);
-		logger.info("Output [ {} ] as [ {} ]", getOutputResourceName(), outputPath);
-		logger.info("Replacements [ {} ]", getChangedProviders());
+                logger.log(Level.INFO, "Input  [ {} ] as [ {} ]", new Object[]{getInputResourceName(), inputPath});
+                logger.log(Level.INFO, "Output [ {} ] as [ {} ]", new Object[]{getOutputResourceName(), outputPath});
+                logger.log(Level.INFO, "Replacements [ {} ]", new Object[]{getChangedProviders()});
 	}
 
 }

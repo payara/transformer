@@ -29,7 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.eclipse.transformer.TransformException;
 import org.eclipse.transformer.action.ActionType;
 import org.eclipse.transformer.util.ByteData;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

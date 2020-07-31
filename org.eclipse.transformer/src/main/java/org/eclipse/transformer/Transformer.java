@@ -58,11 +58,12 @@ import org.eclipse.transformer.action.impl.WarActionImpl;
 // import org.eclipse.transformer.action.impl.XmlActionImpl;
 import org.eclipse.transformer.action.impl.ZipActionImpl;
 import org.eclipse.transformer.util.FileUtils;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import aQute.lib.io.IO;
 import aQute.lib.utf8properties.UTF8Properties;
 import aQute.libg.uri.URIUtil;
+import java.util.logging.Level;
 
 public class Transformer {
 	// TODO: Make this an enum?
@@ -708,18 +709,18 @@ public class Transformer {
 	}
 
 	public void info(String message, Object... parms) {
-		getLogger().info(message, parms);
+		getLogger().log(Level.INFO, message, parms);
 	}
 
 	protected void error(String message, Object... parms) {
-		getLogger().error(message, parms);
+		getLogger().log(Level.SEVERE, message, parms);
 	}
 
 	protected void error(String message, Throwable th, Object... parms) {
 		Logger useLogger = getLogger();
-		if (useLogger.isErrorEnabled()) {
+		if (useLogger.isLoggable(Level.SEVERE)) {
 			message = String.format(message, parms);
-			useLogger.error(message, th);
+			useLogger.log(Level.SEVERE, message, th);
 		}
 	}
 
@@ -768,7 +769,7 @@ public class Transformer {
 			systemPrint(useOutput, message);
 			th.printStackTrace(useOutput);
 		}
-		getLogger().error(message, th);
+		getLogger().log(Level.SEVERE, message, th);
 	}
 
 	//
@@ -822,18 +823,18 @@ public class Transformer {
 		}
 
 		protected void info(String message, Object... parms) {
-			getLogger().info(message, parms);
+			getLogger().log(Level.INFO, message, parms);
 		}
 
 		protected void error(String message, Object... parms) {
-			getLogger().error(message, parms);
+			getLogger().log(Level.SEVERE, message, parms);
 		}
 
 		protected void error(String message, Throwable th, Object... parms) {
 			Logger useLogger = getLogger();
-			if (useLogger.isErrorEnabled()) {
+			if (useLogger.isLoggable(Level.SEVERE)) {
 				message = String.format(message, parms);
-				useLogger.error(message, th);
+				useLogger.log(Level.SEVERE, message, th);
 			}
 		}
 

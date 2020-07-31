@@ -13,21 +13,19 @@ package transformer.test.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.event.Level;
+import java.util.logging.Logger;
 
-public class CaptureLoggerImpl implements Logger {
+public class CaptureLoggerImpl extends Logger {
 	public static final boolean CAPTURE_INACTIVE = true;
 
 	public CaptureLoggerImpl(String baseLoggerName, boolean captureInactive) {
-		this(LoggerFactory.getLogger(baseLoggerName), captureInactive);
+		this(Logger.getLogger(baseLoggerName), captureInactive);
 	}
 
 	public CaptureLoggerImpl(String baseLoggerName) {
-		this(LoggerFactory.getLogger(baseLoggerName));
+		this(Logger.getLogger(baseLoggerName));
 	}
 
 	public CaptureLoggerImpl(Logger baseLogger) {
@@ -35,6 +33,7 @@ public class CaptureLoggerImpl implements Logger {
 	}
 
 	public CaptureLoggerImpl(Logger baseLogger, boolean captureInactive) {
+                super(baseLogger.getName(), null);
 		this.baseLogger = baseLogger;
 
 		this.captureInactive = captureInactive;
@@ -44,24 +43,6 @@ public class CaptureLoggerImpl implements Logger {
 	//
 
 	private final Logger baseLogger;
-
-	public boolean isLoggable(Level level) {
-		Logger useLogger = getBaseLogger();
-		switch (level) {
-			case ERROR :
-				return useLogger.isErrorEnabled();
-			case WARN :
-				return useLogger.isWarnEnabled();
-			case INFO :
-				return useLogger.isInfoEnabled();
-			case DEBUG :
-				return useLogger.isDebugEnabled();
-			case TRACE :
-				return useLogger.isTraceEnabled();
-			default :
-				throw new IllegalArgumentException("Unknown level [ " + level + " ]");
-		}
-	}
 
 	public Logger getBaseLogger() {
 		return baseLogger;
@@ -86,21 +67,17 @@ public class CaptureLoggerImpl implements Logger {
 
 	//
 
-	public LogEvent capture(Level level, Marker marker, String message, Object... rawParms) {
-		return capture(level, marker, null, message, rawParms);
-	}
-
 	public LogEvent capture(Level level, String message, Object... rawParms) {
-		return capture(level, null, null, message, rawParms);
+		return capture(level, null, message, rawParms);
 	}
 
-	public LogEvent capture(Level level, Marker marker, Throwable th, String message, Object... rawParms) {
+	public LogEvent capture(Level level, Throwable th, String message, Object... rawParms) {
 
 		if (!capture(level)) {
 			return null;
 		}
 
-		LogEvent logEvent = new LogEvent(level, marker, th, message, rawParms);
+		LogEvent logEvent = new LogEvent(level, th, message, rawParms);
 		addEvent(logEvent);
 		return logEvent;
 	}
@@ -109,7 +86,6 @@ public class CaptureLoggerImpl implements Logger {
 
 	public static class LogEvent {
 		public final Level		level;
-		public final Marker		marker;
 
 		public final String		threadName;
 		public final long		timeStamp;
@@ -144,10 +120,6 @@ public class CaptureLoggerImpl implements Logger {
 				if (didAdd) {
 					isFirst = false;
 				}
-				didAdd = append(marker, isFirst, builder);
-				if (didAdd) {
-					isFirst = false;
-				}
 				didAdd = append(threadName, isFirst, builder);
 				if (didAdd) {
 					isFirst = false;
@@ -170,9 +142,8 @@ public class CaptureLoggerImpl implements Logger {
 			return printString;
 		}
 
-		public LogEvent(Level level, Marker marker, Throwable th, String message, Object... rawParms) {
+		public LogEvent(Level level, Throwable th, String message, Object... rawParms) {
 			this.level = level;
-			this.marker = marker;
 
 			this.threadName = Thread.currentThread()
 				.getName();
@@ -219,365 +190,57 @@ public class CaptureLoggerImpl implements Logger {
 		return getCapturedEvents().get(eventNo);
 	}
 
-	//
-
 	@Override
-	public boolean isTraceEnabled() {
-		return getBaseLogger().isTraceEnabled();
+	public boolean isLoggable(Level level) {
+		return getBaseLogger().isLoggable(level);
 	}
 
-	@Override
-	public void trace(String msg) {
-		capture(Level.TRACE, msg);
-		getBaseLogger().trace(msg);
-	}
+        @Override
+        public void log(Level level, String format, Object arg) {
+            capture(level, format, arg);
+            getBaseLogger().log(level, format, arg);
+        }
 
-	@Override
-	public void trace(String format, Object arg) {
-		capture(Level.TRACE, format, arg);
-		getBaseLogger().trace(format, arg);
-	}
+        @Override
+        public void config(String msg) {
+            capture(Level.CONFIG, msg);
+            getBaseLogger().config(msg);
+        }
 
-	@Override
-	public void trace(String format, Object arg1, Object arg2) {
-		capture(Level.TRACE, format, arg1, arg2);
-		getBaseLogger().trace(format, arg1, arg2);
-	}
+        @Override
+        public void fine(String msg) {
+            capture(Level.FINE, msg);
+            getBaseLogger().fine(msg);
+        }
 
-	@Override
-	public void trace(String format, Object... args) {
-		capture(Level.TRACE, format, args);
-		getBaseLogger().trace(format, args);
-	}
+        @Override
+        public void finer(String msg) {
+            capture(Level.FINER, msg);
+            getBaseLogger().finer(msg);
+        }
 
-	@Override
-	public void trace(String msg, Throwable t) {
-		capture(Level.TRACE, null, t, msg, (Object[]) null);
-		getBaseLogger().trace(msg, t);
-	}
+        @Override
+        public void finest(String msg) {
+            capture(Level.FINEST, msg);
+            getBaseLogger().finest(msg);
+        }
 
-	@Override
-	public boolean isDebugEnabled() {
-		return getBaseLogger().isDebugEnabled();
-	}
+        @Override
+        public void info(String msg) {
+            capture(Level.INFO, msg);
+            getBaseLogger().info(msg);
+        }
 
-	@Override
-	public void debug(String msg) {
-		capture(Level.DEBUG, msg);
-		getBaseLogger().debug(msg);
-	}
+        @Override
+        public void severe(String msg) {
+            capture(Level.SEVERE, msg);
+            getBaseLogger().severe(msg);
+        }
 
-	@Override
-	public void debug(String format, Object arg) {
-		capture(Level.DEBUG, format, arg);
-		getBaseLogger().debug(format, arg);
-	}
+        @Override
+        public void warning(String msg) {
+            capture(Level.WARNING, msg);
+            getBaseLogger().warning(msg);
+        }
 
-	@Override
-	public void debug(String format, Object arg1, Object arg2) {
-		capture(Level.DEBUG, format, arg1, arg2);
-		getBaseLogger().debug(format, arg1, arg2);
-	}
-
-	@Override
-	public void debug(String format, Object... args) {
-		capture(Level.DEBUG, format, args);
-		getBaseLogger().debug(format, args);
-	}
-
-	@Override
-	public void debug(String msg, Throwable t) {
-		capture(Level.DEBUG, null, t, msg, (Object[]) null);
-		getBaseLogger().debug(msg, t);
-	}
-
-	@Override
-	public boolean isInfoEnabled() {
-		return getBaseLogger().isInfoEnabled();
-	}
-
-	@Override
-	public void info(String msg) {
-		capture(Level.INFO, msg);
-		getBaseLogger().info(msg);
-	}
-
-	@Override
-	public void info(String format, Object arg) {
-		capture(Level.INFO, format, arg);
-		getBaseLogger().info(format, arg);
-	}
-
-	@Override
-	public void info(String format, Object arg1, Object arg2) {
-		capture(Level.INFO, format, arg1, arg2);
-		getBaseLogger().info(format, arg1, arg2);
-	}
-
-	@Override
-	public void info(String format, Object... args) {
-		capture(Level.INFO, format, args);
-		getBaseLogger().info(format, args);
-	}
-
-	@Override
-	public void info(String msg, Throwable t) {
-		capture(Level.INFO, null, t, msg, (Object[]) null);
-		getBaseLogger().info(msg, t);
-	}
-
-	@Override
-	public boolean isWarnEnabled() {
-		return getBaseLogger().isWarnEnabled();
-	}
-
-	@Override
-	public void warn(String msg) {
-		capture(Level.WARN, msg);
-		getBaseLogger().warn(msg);
-	}
-
-	@Override
-	public void warn(String format, Object arg) {
-		capture(Level.WARN, format, arg);
-		getBaseLogger().warn(format, arg);
-	}
-
-	@Override
-	public void warn(String format, Object... args) {
-		capture(Level.WARN, format, args);
-		getBaseLogger().warn(format, args);
-	}
-
-	@Override
-	public void warn(String format, Object arg1, Object arg2) {
-		capture(Level.WARN, format, arg1, arg2);
-		getBaseLogger().warn(format, arg1, arg2);
-	}
-
-	@Override
-	public void warn(String msg, Throwable t) {
-		capture(Level.WARN, null, t, msg, (Object[]) null);
-		getBaseLogger().warn(msg, t);
-	}
-
-	@Override
-	public boolean isErrorEnabled() {
-		return getBaseLogger().isErrorEnabled();
-	}
-
-	@Override
-	public void error(String msg) {
-		capture(Level.ERROR, msg);
-		getBaseLogger().error(msg);
-	}
-
-	@Override
-	public void error(String format, Object arg) {
-		capture(Level.ERROR, format, arg);
-		getBaseLogger().error(format, arg);
-	}
-
-	@Override
-	public void error(String format, Object arg1, Object arg2) {
-		capture(Level.ERROR, format, arg1, arg2);
-		getBaseLogger().error(format, arg1, arg2);
-	}
-
-	@Override
-	public void error(String format, Object... args) {
-		capture(Level.ERROR, format, args);
-		getBaseLogger().error(format, args);
-	}
-
-	@Override
-	public void error(String msg, Throwable t) {
-		capture(Level.ERROR, null, t, msg, (Object[]) null);
-		getBaseLogger().error(msg, t);
-	}
-
-	//
-
-	@Override
-	public boolean isTraceEnabled(Marker marker) {
-		return getBaseLogger().isTraceEnabled(marker);
-	}
-
-	@Override
-	public void trace(Marker marker, String msg) {
-		capture(Level.TRACE, marker, msg);
-		getBaseLogger().trace(marker, msg);
-	}
-
-	@Override
-	public void trace(Marker marker, String format, Object arg) {
-		capture(Level.TRACE, marker, format, arg);
-		getBaseLogger().trace(marker, format, arg);
-	}
-
-	@Override
-	public void trace(Marker marker, String format, Object arg1, Object arg2) {
-		capture(Level.TRACE, marker, format, arg1, arg2);
-		getBaseLogger().trace(marker, format, arg1, arg2);
-	}
-
-	@Override
-	public void trace(Marker marker, String format, Object... args) {
-		capture(Level.TRACE, marker, format, args);
-		getBaseLogger().trace(marker, format, args);
-	}
-
-	@Override
-	public void trace(Marker marker, String msg, Throwable t) {
-		capture(Level.TRACE, marker, t, msg);
-		getBaseLogger().trace(marker, msg, t);
-	}
-
-	//
-
-	@Override
-	public boolean isDebugEnabled(Marker marker) {
-		return getBaseLogger().isDebugEnabled(marker);
-	}
-
-	@Override
-	public void debug(Marker marker, String msg) {
-		capture(Level.DEBUG, marker, msg);
-		getBaseLogger().debug(marker, msg);
-	}
-
-	@Override
-	public void debug(Marker marker, String format, Object arg) {
-		capture(Level.DEBUG, marker, format, arg);
-		getBaseLogger().debug(marker, format, arg);
-	}
-
-	@Override
-	public void debug(Marker marker, String format, Object arg1, Object arg2) {
-		capture(Level.DEBUG, marker, format, arg1, arg2);
-		getBaseLogger().debug(marker, format, arg1, arg2);
-	}
-
-	@Override
-	public void debug(Marker marker, String format, Object... args) {
-		capture(Level.DEBUG, marker, format, args);
-		getBaseLogger().debug(marker, format, args);
-	}
-
-	@Override
-	public void debug(Marker marker, String msg, Throwable t) {
-		capture(Level.DEBUG, marker, t, msg);
-		getBaseLogger().debug(marker, msg, t);
-	}
-
-	//
-
-	@Override
-	public boolean isInfoEnabled(Marker marker) {
-		return getBaseLogger().isInfoEnabled(marker);
-	}
-
-	@Override
-	public void info(Marker marker, String msg) {
-		capture(Level.INFO, marker, msg);
-		getBaseLogger().info(marker, msg);
-	}
-
-	@Override
-	public void info(Marker marker, String format, Object arg) {
-		capture(Level.INFO, marker, format, arg);
-		getBaseLogger().info(marker, format, arg);
-	}
-
-	@Override
-	public void info(Marker marker, String format, Object arg1, Object arg2) {
-		capture(Level.INFO, marker, format, arg1, arg2);
-		getBaseLogger().info(marker, format, arg1, arg2);
-	}
-
-	@Override
-	public void info(Marker marker, String format, Object... args) {
-		capture(Level.INFO, marker, format, args);
-		getBaseLogger().info(marker, format, args);
-	}
-
-	@Override
-	public void info(Marker marker, String msg, Throwable t) {
-		capture(Level.INFO, marker, t, msg);
-		getBaseLogger().info(marker, msg, t);
-	}
-
-	//
-
-	@Override
-	public boolean isWarnEnabled(Marker marker) {
-		return getBaseLogger().isWarnEnabled(marker);
-	}
-
-	@Override
-	public void warn(Marker marker, String msg) {
-		capture(Level.WARN, marker, msg);
-		getBaseLogger().warn(marker, msg);
-	}
-
-	@Override
-	public void warn(Marker marker, String format, Object arg) {
-		capture(Level.WARN, marker, format, arg);
-		getBaseLogger().warn(marker, format, arg);
-	}
-
-	@Override
-	public void warn(Marker marker, String format, Object arg1, Object arg2) {
-		capture(Level.WARN, marker, format, arg1, arg2);
-		getBaseLogger().warn(marker, format, arg1, arg2);
-	}
-
-	@Override
-	public void warn(Marker marker, String format, Object... args) {
-		capture(Level.WARN, marker, format, args);
-		getBaseLogger().warn(marker, format, args);
-	}
-
-	@Override
-	public void warn(Marker marker, String msg, Throwable t) {
-		capture(Level.WARN, marker, t, msg);
-		getBaseLogger().warn(marker, msg, t);
-	}
-
-	//
-
-	@Override
-	public boolean isErrorEnabled(Marker marker) {
-		return getBaseLogger().isErrorEnabled(marker);
-	}
-
-	@Override
-	public void error(Marker marker, String msg) {
-		capture(Level.ERROR, marker, msg);
-		getBaseLogger().error(marker, msg);
-	}
-
-	@Override
-	public void error(Marker marker, String format, Object arg) {
-		capture(Level.ERROR, marker, format, arg);
-		getBaseLogger().error(marker, format, arg);
-	}
-
-	@Override
-	public void error(Marker marker, String format, Object arg1, Object arg2) {
-		capture(Level.ERROR, marker, format, arg1, arg2);
-		getBaseLogger().error(marker, format, arg1, arg2);
-	}
-
-	@Override
-	public void error(Marker marker, String format, Object... args) {
-		capture(Level.ERROR, marker, format, args);
-		getBaseLogger().error(marker, format, args);
-	}
-
-	@Override
-	public void error(Marker marker, String msg, Throwable t) {
-		capture(Level.ERROR, marker, t, msg);
-		getBaseLogger().error(marker, msg, t);
-	}
 }

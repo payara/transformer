@@ -28,7 +28,7 @@ import org.eclipse.transformer.action.ContainerChanges;
 import org.eclipse.transformer.util.ByteData;
 import org.eclipse.transformer.util.FileUtils;
 import org.eclipse.transformer.util.InputStreamData;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public abstract class ContainerActionImpl extends ActionImpl implements ContainerAction {
 

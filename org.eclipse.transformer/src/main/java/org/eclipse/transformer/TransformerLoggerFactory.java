@@ -13,8 +13,7 @@ package org.eclipse.transformer;
 
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import aQute.lib.utf8properties.UTF8Properties;
 
@@ -174,7 +173,7 @@ public class TransformerLoggerFactory {
 	public Logger createLogger() throws TransformException {
 		setLoggingProperties(); // throws TransformException
 		String logName = selectLoggerName();
-		return LoggerFactory.getLogger(logName);
+		return Logger.getLogger(logName);
 	}
 
 	protected void setLoggingProperties() throws TransformException {

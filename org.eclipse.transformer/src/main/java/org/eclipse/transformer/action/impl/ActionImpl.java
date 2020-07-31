@@ -26,7 +26,7 @@ import org.eclipse.transformer.action.SignatureRule.SignatureType;
 import org.eclipse.transformer.util.ByteData;
 import org.eclipse.transformer.util.FileUtils;
 import org.eclipse.transformer.util.InputStreamData;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import aQute.bnd.signatures.ArrayTypeSignature;
 import aQute.bnd.signatures.ClassSignature;
@@ -41,6 +41,7 @@ import aQute.bnd.signatures.ThrowsSignature;
 import aQute.bnd.signatures.TypeArgument;
 import aQute.bnd.signatures.TypeParameter;
 import aQute.lib.io.IO;
+import java.util.logging.Level;
 
 public abstract class ActionImpl implements Action {
 	public ActionImpl(Logger logger, boolean isTerse, boolean isVerbose, InputBufferImpl buffer,
@@ -92,15 +93,15 @@ public abstract class ActionImpl implements Action {
 	}
 
 	public void trace(String message, Object... parms) {
-		getLogger().trace(message, parms);
+		getLogger().log(Level.FINEST, message, parms);
 	}
 
 	public void debug(String message, Object... parms) {
-		getLogger().debug(message, parms);
+		getLogger().log(Level.FINE, message, parms);
 	}
 
 	public void info(String message, Object... parms) {
-		getLogger().info(message, parms);
+		getLogger().log(Level.INFO, message, parms);
 	}
 
 	public void terse(String message, Object... parms) {
@@ -116,16 +117,16 @@ public abstract class ActionImpl implements Action {
 	}
 
 	public void warn(String message, Object... parms) {
-		getLogger().warn(message, parms);
+		getLogger().log(Level.WARNING, message, parms);
 	}
 
 	public void error(String message, Object... parms) {
-		getLogger().error(message, parms);
+		getLogger().log(Level.SEVERE, message, parms);
 	}
 
 	public void error(String message, Throwable th, Object... parms) {
 		Logger useLogger = getLogger();
-		if (!useLogger.isErrorEnabled()) {
+		if (!useLogger.isLoggable(Level.SEVERE)) {
 			return;
 		}
 
@@ -134,7 +135,7 @@ public abstract class ActionImpl implements Action {
 			message = String.format(message, parms);
 		}
 
-		useLogger.error(message, th);
+		useLogger.log(Level.SEVERE, message, th);
 	}
 
 	//

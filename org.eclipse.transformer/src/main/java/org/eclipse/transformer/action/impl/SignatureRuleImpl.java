@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import org.eclipse.transformer.action.BundleData;
 import org.eclipse.transformer.action.SignatureRule;
 import org.eclipse.transformer.util.FileUtils;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import aQute.bnd.signatures.ArrayTypeSignature;
 import aQute.bnd.signatures.BaseType;
@@ -38,6 +38,7 @@ import aQute.bnd.signatures.ThrowsSignature;
 import aQute.bnd.signatures.TypeArgument;
 import aQute.bnd.signatures.TypeParameter;
 import aQute.bnd.signatures.TypeVariableSignature;
+import java.util.logging.Level;
 
 public class SignatureRuleImpl implements SignatureRule {
 
@@ -156,7 +157,7 @@ public class SignatureRuleImpl implements SignatureRule {
 	}
 
 	public void debug(String message, Object... parms) {
-		getLogger().debug(message, parms);
+		getLogger().log(Level.FINE, message, parms);
 	}
 
 	//

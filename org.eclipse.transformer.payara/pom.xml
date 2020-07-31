@@ -85,9 +85,7 @@
                             aQute.bnd.header,
                             aQute.bnd.signatures,
                             aQute.lib.*,
-                            aQute.libg.*,
-                            org.slf4j,
-                            org.slf4j.*
+                            aQute.libg.*
                         </Export-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>

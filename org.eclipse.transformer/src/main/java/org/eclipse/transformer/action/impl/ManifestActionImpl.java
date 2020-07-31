@@ -25,7 +25,7 @@ import org.eclipse.transformer.action.ActionType;
 import org.eclipse.transformer.action.BundleData;
 import org.eclipse.transformer.util.ByteData;
 import org.eclipse.transformer.util.ManifestWriter;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import aQute.bnd.header.Attrs;
 import aQute.bnd.header.OSGiHeader;

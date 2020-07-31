@@ -12,10 +12,11 @@
 package org.eclipse.transformer.action.impl;
 
 import java.io.PrintStream;
+import java.util.logging.Level;
 
 import org.eclipse.transformer.action.Changes;
 import org.eclipse.transformer.action.ContainerChanges;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class ChangesImpl implements Changes {
 	public ChangesImpl() {
@@ -114,15 +115,15 @@ public class ChangesImpl implements Changes {
 
 	@Override
 	public void displayTerse(Logger logger, String inputPath, String outputPath) {
-		if (!logger.isInfoEnabled()) {
+		if (!logger.isLoggable(Level.INFO)) {
 			return;
 		}
 
 		if (!inputPath.equals(outputPath)) {
 			if (!inputPath.equals(outputPath)) {
-				logger.info("Input [ {} ] as [ {} ]: {}", inputPath, outputPath, getChangeTag());
+				logger.log(Level.INFO, "Input [ {} ] as [ {} ]: {}", new Object[] {inputPath, outputPath, getChangeTag()});
 			} else {
-				logger.info("Input [ {} ]: {}", inputPath, getChangeTag());
+				logger.log(Level.INFO, "Input [ {} ]: {}", new Object[] {inputPath, getChangeTag()});
 			}
 		}
 	}
@@ -146,12 +147,12 @@ public class ChangesImpl implements Changes {
 
 	@Override
 	public void displayVerbose(Logger logger, String inputPath, String outputPath) {
-		if (!logger.isInfoEnabled()) {
+		if (!logger.isLoggable(Level.INFO)) {
 			return;
 		}
 
-		logger.info("Input  [ {} ] as [ {} ]", getInputResourceName(), inputPath);
-		logger.info("Output [ {} ] as [ {} ]", getOutputResourceName(), outputPath);
-		logger.info("Replacements  [ {} ]", getReplacements());
+		logger.log(Level.INFO, "Input  [ {} ] as [ {} ]", new Object[] {getInputResourceName(), inputPath});
+		logger.log(Level.INFO, "Output [ {} ] as [ {} ]", new Object[] {getOutputResourceName(), outputPath});
+		logger.log(Level.INFO, "Replacements  [ {} ]", new Object[] {getReplacements()});
 	}
 }
