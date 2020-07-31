@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 import org.eclipse.transformer.Transformer;
 import org.eclipse.transformer.Transformer.TransformOptions;
@@ -58,7 +59,7 @@ class TestCommandLine {
 		});
 		t.setParsedArgs();
 		TransformOptions options = t.createTransformOptions();
-		options.setLogging();
+		options.setLogging(Logger.getLogger(TestCommandLine.class.getName()));
 	}
 
 	private void verifyAction(String actionClassName, String inputFileName, String outputFileName) throws Exception {
@@ -75,7 +76,7 @@ class TestCommandLine {
 		t.setParsedArgs();
 
 		TransformOptions options = t.createTransformOptions();
-		options.setLogging();
+		options.setLogging(Logger.getLogger(TestCommandLine.class.getName()));
 
 		assertTrue(options.setInput(), "options.setInput() failed");
 		assertEquals(inputFileName, options.getInputFileName(),

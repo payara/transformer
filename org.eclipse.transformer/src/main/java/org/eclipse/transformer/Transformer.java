@@ -34,7 +34,6 @@ import org.apache.commons.cli.Option.Builder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.eclipse.transformer.TransformerLoggerFactory.LoggerProperty;
 import org.eclipse.transformer.action.ActionType;
 import org.eclipse.transformer.action.BundleData;
 import org.eclipse.transformer.action.Changes;
@@ -613,13 +612,6 @@ public class Transformer {
 				helpWriter.println("  [ " + actionType.name() + " ]");
 			}
 
-			helpWriter.println();
-			helpWriter.println("Logging Properties:");
-			for (TransformerLoggerFactory.LoggerProperty loggerProperty : TransformerLoggerFactory.LoggerProperty
-				.values()) {
-				helpWriter.println("  [ " + loggerProperty.getPropertyName() + " ]");
-			}
-
 			helpWriter.flush();
 		}
 	}
@@ -729,25 +721,27 @@ public class Transformer {
 	public boolean	toSysOut;
 	public boolean	toSysErr;
 
-	protected void detectLogFile() {
-		toSysOut = TransformerLoggerFactory.logToSysOut();
-		if (toSysOut) {
-			outputPrint("Logging is to System.out\n");
-		}
+        public boolean isToSysOut() {
+            return toSysOut;
+        }
 
-		toSysErr = TransformerLoggerFactory.logToSysErr();
-		if (toSysOut) {
-			outputPrint("Logging is to System.err\n");
-		}
+        public void setToSysOut(boolean toSysOut) {
+            this.toSysOut = toSysOut;
+        }
 
-		outputPrint("Log file [ " + System.getProperty(LoggerProperty.LOG_FILE.getPropertyName()) + " ]");
-	}
+        public boolean isToSysErr() {
+            return toSysErr;
+        }
+
+        public void setToSysErr(boolean toSysErr) {
+            this.toSysErr = toSysErr;
+        }
 
 	public void dual_info(String message, Object... parms) {
 		if (parms.length != 0) {
 			message = String.format(message, parms);
 		}
-		if (!toSysOut && !toSysErr) {
+		if (toSysOut) {
 			systemPrint(getSystemOut(), message);
 		}
 		info(message);
@@ -757,14 +751,14 @@ public class Transformer {
 		if (parms.length != 0) {
 			message = String.format(message, parms);
 		}
-		if (!toSysOut && !toSysErr) {
+		if (toSysErr) {
 			systemPrint(getSystemErr(), message);
 		}
 		info(message);
 	}
 
 	protected void dual_error(String message, Throwable th) {
-		if (!toSysOut && !toSysErr) {
+		if (toSysErr) {
 			PrintStream useOutput = getSystemErr();
 			systemPrint(useOutput, message);
 			th.printStackTrace(useOutput);
@@ -811,10 +805,8 @@ public class Transformer {
 		public Map<String, Map<String, String>> perClassConstantStrings;
 		//
 
-		public void setLogging() throws TransformException {
-			logger = new TransformerLoggerFactory(Transformer.this).createLogger(); // throws
-																					// TransformException
-
+		public void setLogging(Logger log) throws TransformException {
+                        logger = log;
 			if (hasOption(AppOption.LOG_TERSE)) {
 				isTerse = true;
 			} else if (hasOption(AppOption.LOG_VERBOSE)) {
@@ -1374,21 +1366,21 @@ public class Transformer {
 			acceptedAction.apply(inputName, inputFile, outputFile);
 
 			if (isTerse) {
-				if (!toSysOut && !toSysErr) {
+				if (toSysOut) {
 					acceptedAction.getLastActiveChanges()
 						.displayTerse(getSystemOut(), inputPath, outputPath);
 				}
 				acceptedAction.getLastActiveChanges()
 					.displayTerse(getLogger(), inputPath, outputPath);
 			} else if (isVerbose) {
-				if (!toSysOut && !toSysErr) {
+				if (toSysOut) {
 					acceptedAction.getLastActiveChanges()
 						.displayVerbose(getSystemOut(), inputPath, outputPath);
 				}
 				acceptedAction.getLastActiveChanges()
 					.displayVerbose(getLogger(), inputPath, outputPath);
 			} else {
-				if (!toSysOut && !toSysErr) {
+				if (toSysOut) {
 					acceptedAction.getLastActiveChanges()
 						.display(getSystemOut(), inputPath, outputPath);
 				}
@@ -1428,12 +1420,11 @@ public class Transformer {
 		TransformOptions options = createTransformOptions();
 
 		try {
-			options.setLogging();
+			options.setLogging(Logger.getLogger(Transformer.class.getName()));
 		} catch (Exception e) {
 			errorPrint("Logger settings error: %s", e);
 			return LOGGER_SETTINGS_ERROR_RC;
 		}
-		detectLogFile();
 
 		if (!options.setInput()) {
 			return TRANSFORM_ERROR_RC;

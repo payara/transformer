@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.logging.Logger;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.transformer.TransformException;
 import org.eclipse.transformer.Transformer;
@@ -39,8 +40,10 @@ public class JakartaNamespaceTransformer extends Transformer {
 
     private final boolean invert;
 
-    public JakartaNamespaceTransformer(PrintStream sysOut, PrintStream sysErr, File input, boolean invert) throws IOException {
-        super(sysOut, sysErr);
+    private final Logger logger;
+
+    public JakartaNamespaceTransformer(Logger logger, File input, boolean invert) throws IOException {
+        super(System.out, System.err);
         String prefix = invert ? "JAVAX-" : "JAKARTA-";
         if (input.isDirectory()) {
             output = Files.createTempDirectory(input.getParentFile().toPath(), prefix + input.getName()).toFile();
@@ -48,6 +51,7 @@ public class JakartaNamespaceTransformer extends Transformer {
             output = File.createTempFile(prefix, input.getName(), input.getParentFile());
         }
         options = new PayaraTransformOptions(input, output, invert);
+        this.logger = logger;
         this.invert = invert;
     }
 
@@ -63,13 +67,14 @@ public class JakartaNamespaceTransformer extends Transformer {
             errorPrint("Exception parsing command line arguments: %s", e);
             return PARSE_ERROR_RC;
         }
+
         try {
-            options.setLogging();
+            options.setLogging(logger);
         } catch (TransformException e) {
             errorPrint("Logger settings error: %s", e);
             return LOGGER_SETTINGS_ERROR_RC;
         }
-        detectLogFile();
+
         setOptionDefaults(JakartaTransformer.class, JakartaTransformer.getOptionDefaults());
         boolean loadedRules;
         try {
