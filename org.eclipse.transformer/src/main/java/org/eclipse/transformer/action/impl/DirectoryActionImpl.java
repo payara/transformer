@@ -16,7 +16,7 @@ import java.io.File;
 import org.eclipse.transformer.TransformException;
 import org.eclipse.transformer.action.Action;
 import org.eclipse.transformer.action.ActionType;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class DirectoryActionImpl extends ContainerActionImpl {
 

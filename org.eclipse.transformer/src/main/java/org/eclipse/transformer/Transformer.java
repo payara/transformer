@@ -34,7 +34,6 @@ import org.apache.commons.cli.Option.Builder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.eclipse.transformer.TransformerLoggerFactory.LoggerProperty;
 import org.eclipse.transformer.action.ActionType;
 import org.eclipse.transformer.action.BundleData;
 import org.eclipse.transformer.action.Changes;
@@ -58,11 +57,12 @@ import org.eclipse.transformer.action.impl.WarActionImpl;
 // import org.eclipse.transformer.action.impl.XmlActionImpl;
 import org.eclipse.transformer.action.impl.ZipActionImpl;
 import org.eclipse.transformer.util.FileUtils;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import aQute.lib.io.IO;
 import aQute.lib.utf8properties.UTF8Properties;
 import aQute.libg.uri.URIUtil;
+import java.util.logging.Level;
 
 public class Transformer {
 	// TODO: Make this an enum?
@@ -354,7 +354,9 @@ public class Transformer {
 	public static Properties loadProperties(String resourceRef) throws IOException {
 		Properties properties = new Properties();
 		try (InputStream inputStream = Transformer.getResourceStream(resourceRef)) {
+                    if(inputStream != null){
 			properties.load(inputStream);
+		}
 		}
 		return properties;
 	}
@@ -610,13 +612,6 @@ public class Transformer {
 				helpWriter.println("  [ " + actionType.name() + " ]");
 			}
 
-			helpWriter.println();
-			helpWriter.println("Logging Properties:");
-			for (TransformerLoggerFactory.LoggerProperty loggerProperty : TransformerLoggerFactory.LoggerProperty
-				.values()) {
-				helpWriter.println("  [ " + loggerProperty.getPropertyName() + " ]");
-			}
-
 			helpWriter.flush();
 		}
 	}
@@ -706,18 +701,18 @@ public class Transformer {
 	}
 
 	public void info(String message, Object... parms) {
-		getLogger().info(message, parms);
+		getLogger().log(Level.INFO, message, parms);
 	}
 
 	protected void error(String message, Object... parms) {
-		getLogger().error(message, parms);
+		getLogger().log(Level.SEVERE, message, parms);
 	}
 
 	protected void error(String message, Throwable th, Object... parms) {
 		Logger useLogger = getLogger();
-		if (useLogger.isErrorEnabled()) {
+		if (useLogger.isLoggable(Level.SEVERE)) {
 			message = String.format(message, parms);
-			useLogger.error(message, th);
+			useLogger.log(Level.SEVERE, message, th);
 		}
 	}
 
@@ -726,25 +721,27 @@ public class Transformer {
 	public boolean	toSysOut;
 	public boolean	toSysErr;
 
-	protected void detectLogFile() {
-		toSysOut = TransformerLoggerFactory.logToSysOut();
-		if (toSysOut) {
-			outputPrint("Logging is to System.out\n");
-		}
+        public boolean isToSysOut() {
+            return toSysOut;
+        }
 
-		toSysErr = TransformerLoggerFactory.logToSysErr();
-		if (toSysOut) {
-			outputPrint("Logging is to System.err\n");
-		}
+        public void setToSysOut(boolean toSysOut) {
+            this.toSysOut = toSysOut;
+        }
 
-		outputPrint("Log file [ " + System.getProperty(LoggerProperty.LOG_FILE.getPropertyName()) + " ]");
-	}
+        public boolean isToSysErr() {
+            return toSysErr;
+        }
+
+        public void setToSysErr(boolean toSysErr) {
+            this.toSysErr = toSysErr;
+        }
 
 	public void dual_info(String message, Object... parms) {
 		if (parms.length != 0) {
 			message = String.format(message, parms);
 		}
-		if (!toSysOut && !toSysErr) {
+		if (toSysOut) {
 			systemPrint(getSystemOut(), message);
 		}
 		info(message);
@@ -754,19 +751,19 @@ public class Transformer {
 		if (parms.length != 0) {
 			message = String.format(message, parms);
 		}
-		if (!toSysOut && !toSysErr) {
+		if (toSysErr) {
 			systemPrint(getSystemErr(), message);
 		}
 		info(message);
 	}
 
 	protected void dual_error(String message, Throwable th) {
-		if (!toSysOut && !toSysErr) {
+		if (toSysErr) {
 			PrintStream useOutput = getSystemErr();
 			systemPrint(useOutput, message);
 			th.printStackTrace(useOutput);
 		}
-		getLogger().error(message, th);
+		getLogger().log(Level.SEVERE, message, th);
 	}
 
 	//
@@ -808,10 +805,8 @@ public class Transformer {
 		public Map<String, Map<String, String>> perClassConstantStrings;
 		//
 
-		public void setLogging() throws TransformException {
-			logger = new TransformerLoggerFactory(Transformer.this).createLogger(); // throws
-																					// TransformException
-
+		public void setLogging(Logger log) throws TransformException {
+                        logger = log;
 			if (hasOption(AppOption.LOG_TERSE)) {
 				isTerse = true;
 			} else if (hasOption(AppOption.LOG_VERBOSE)) {
@@ -820,18 +815,18 @@ public class Transformer {
 		}
 
 		protected void info(String message, Object... parms) {
-			getLogger().info(message, parms);
+			getLogger().log(Level.INFO, message, parms);
 		}
 
 		protected void error(String message, Object... parms) {
-			getLogger().error(message, parms);
+			getLogger().log(Level.SEVERE, message, parms);
 		}
 
 		protected void error(String message, Throwable th, Object... parms) {
 			Logger useLogger = getLogger();
-			if (useLogger.isErrorEnabled()) {
+			if (useLogger.isLoggable(Level.SEVERE)) {
 				message = String.format(message, parms);
-				useLogger.error(message, th);
+				useLogger.log(Level.SEVERE, message, th);
 			}
 		}
 
@@ -977,37 +972,37 @@ public class Transformer {
 				perClassConstantStrings = null;
 				dual_info("Per class constant mapping files are not enabled");
 			}
-			return validateRules(packageRenames, packageVersions);
-		}
+	                return validateRules(packageRenames, packageVersions, invert);
+            }
 
-		protected boolean validateRules(Map<String, String> renamesMap, Map<String, String> versionsMap) {
+                protected boolean validateRules(Map<String, String> renamesMap, Map<String, String> versionsMap, boolean invert) {
 
-			if ((versionsMap == null) || versionsMap.isEmpty()) {
-				return true; // Nothing to validate
-			}
+                if ((versionsMap == null) || versionsMap.isEmpty()) {
+                    return true; // Nothing to validate
+                }
 
-			if ((renamesMap == null) || renamesMap.isEmpty()) {
-				String renamesRef = getRuleFileName(AppOption.RULES_RENAMES);
-				String versionsRef = getRuleFileName(AppOption.RULES_VERSIONS);
+                if ((renamesMap == null) || renamesMap.isEmpty()) {
+                    String renamesRef = getRuleFileName(AppOption.RULES_RENAMES);
+                    String versionsRef = getRuleFileName(AppOption.RULES_VERSIONS);
 
-				if (renamesRef == null) {
-					dual_error("Package version updates were specified in [ " + versionsRef + " ]"
-						+ "but no rename rules were specified.");
-				} else {
-					dual_error("Package version updates were specified in [ " + versionsRef + " ]"
-						+ "but no rename rules were specified in [ " + renamesRef + " ]");
-				}
-				return false;
-			}
+                    if (renamesRef == null) {
+                        dual_error("Package version updates were specified in [ " + versionsRef + " ]"
+                                + "but no rename rules were specified.");
+                    } else {
+                        dual_error("Package version updates were specified in [ " + versionsRef + " ]"
+                                + "but no rename rules were specified in [ " + renamesRef + " ]");
+                    }
+                    return false;
+                }
 
-			for (String entry : versionsMap.keySet()) {
-				if (!renamesMap.containsValue(entry)) {
-					dual_error(
-						"Version rule key [ " + entry + "]" + " from [ " + getRuleFileName(AppOption.RULES_VERSIONS)
-							+ " ]" + " not found in rename rules [ " + getRuleFileName(AppOption.RULES_RENAMES) + " ]");
-					return false;
-				}
-			}
+                for (String entry : versionsMap.keySet()) {
+                    if ((!invert && !renamesMap.containsValue(entry)) || (invert && !renamesMap.containsKey(entry))) {
+                        dual_error(
+                                "Version rule key [ " + entry + "]" + " from [ " + getRuleFileName(AppOption.RULES_VERSIONS)
+                                + " ]" + " not found in rename rules [ " + getRuleFileName(AppOption.RULES_RENAMES) + " ]");
+                        return false;
+                    }
+                }
 
 			return true;
 		}
@@ -1371,21 +1366,21 @@ public class Transformer {
 			acceptedAction.apply(inputName, inputFile, outputFile);
 
 			if (isTerse) {
-				if (!toSysOut && !toSysErr) {
+				if (toSysOut) {
 					acceptedAction.getLastActiveChanges()
 						.displayTerse(getSystemOut(), inputPath, outputPath);
 				}
 				acceptedAction.getLastActiveChanges()
 					.displayTerse(getLogger(), inputPath, outputPath);
 			} else if (isVerbose) {
-				if (!toSysOut && !toSysErr) {
+				if (toSysOut) {
 					acceptedAction.getLastActiveChanges()
 						.displayVerbose(getSystemOut(), inputPath, outputPath);
 				}
 				acceptedAction.getLastActiveChanges()
 					.displayVerbose(getLogger(), inputPath, outputPath);
 			} else {
-				if (!toSysOut && !toSysErr) {
+				if (toSysOut) {
 					acceptedAction.getLastActiveChanges()
 						.display(getSystemOut(), inputPath, outputPath);
 				}
@@ -1425,12 +1420,11 @@ public class Transformer {
 		TransformOptions options = createTransformOptions();
 
 		try {
-			options.setLogging();
+			options.setLogging(Logger.getLogger(Transformer.class.getName()));
 		} catch (Exception e) {
 			errorPrint("Logger settings error: %s", e);
 			return LOGGER_SETTINGS_ERROR_RC;
 		}
-		detectLogFile();
 
 		if (!options.setInput()) {
 			return TRANSFORM_ERROR_RC;

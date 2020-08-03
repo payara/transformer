@@ -12,8 +12,9 @@
 package org.eclipse.transformer.action.impl;
 
 import java.io.PrintStream;
+import java.util.logging.Level;
 
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class ClassChangesImpl extends ChangesImpl {
 	@Override
@@ -183,24 +184,24 @@ public class ClassChangesImpl extends ChangesImpl {
 
 	@Override
 	public void displayVerbose(Logger logger, String inputPath, String outputPath) {
-		if (!logger.isInfoEnabled()) {
+		if (!logger.isLoggable(Level.INFO)) {
 			return;
 		}
 
-		logger.info("Input name [ {} ] as [ {} ]", getInputResourceName(), inputPath);
+		logger.log(Level.INFO, "Input name [ {} ] as [ {} ]", new Object[] {getInputResourceName(), inputPath});
 
-		logger.info("Output name [ {} ] as [ {} ]", getOutputResourceName(), outputPath);
+		logger.log(Level.INFO, "Output name [ {} ] as [ {} ]", new Object[] {getOutputResourceName(), outputPath});
 
-		logger.info("Class name [ {} ] [ {} ]", getInputClassName(), getOutputClassName());
+		logger.log(Level.INFO, "Class name [ {} ] [ {} ]", new Object[] {getInputClassName(), getOutputClassName()});
 
 		String useInputSuperName = getInputSuperName();
 		if (useInputSuperName != null) {
-			logger.info("Super class name [ {} ] [ {} ]", useInputSuperName, getOutputSuperName());
+			logger.log(Level.INFO, "Super class name [ {} ] [ {} ]", new Object[] {useInputSuperName, getOutputSuperName()});
 		}
 
-		logger.info("Modified interfaces [ {} ]", getModifiedInterfaces());
-		logger.info("Modified fields     [ {} ]", getModifiedFields());
-		logger.info("Modified methods    [ {} ]", getModifiedMethods());
-		logger.info("Modified constants  [ {} ]", getModifiedConstants());
+		logger.log(Level.INFO, "Modified interfaces [ {} ]", getModifiedInterfaces());
+		logger.log(Level.INFO, "Modified fields     [ {} ]", getModifiedFields());
+		logger.log(Level.INFO, "Modified methods    [ {} ]", getModifiedMethods());
+		logger.log(Level.INFO, "Modified constants  [ {} ]", getModifiedConstants());
 	}
 }

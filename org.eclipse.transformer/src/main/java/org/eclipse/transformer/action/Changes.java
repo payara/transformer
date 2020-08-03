@@ -13,7 +13,7 @@ package org.eclipse.transformer.action;
 
 import java.io.PrintStream;
 
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public interface Changes {
 	String getInputResourceName();

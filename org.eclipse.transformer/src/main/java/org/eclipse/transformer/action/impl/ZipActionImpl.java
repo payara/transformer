@@ -12,7 +12,7 @@
 package org.eclipse.transformer.action.impl;
 
 import org.eclipse.transformer.action.ActionType;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class ZipActionImpl extends ContainerActionImpl {
 

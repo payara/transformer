@@ -22,7 +22,7 @@
 	<version>${revision}</version>
 
 	<properties>
-		<revision>0.2.0-SNAPSHOT</revision>
+		<revision>0.2.0</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -42,6 +42,7 @@
 		<module>org.eclipse.transformer</module>
 		<module>org.eclipse.transformer.cli</module>
 		<module>org.eclipse.transformer.maven</module>
+		<module>org.eclipse.transformer.payara</module>
 	</modules>
 
 	<url>https://projects.eclipse.org/projects/technology.transformer</url>
@@ -326,12 +327,6 @@
 				<artifactId>commons-cli</artifactId>
 				<version>1.4</version>
 				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>1.7.30</version>
-				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>

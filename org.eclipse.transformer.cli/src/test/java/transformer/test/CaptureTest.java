@@ -20,7 +20,7 @@ import org.eclipse.transformer.action.BundleData;
 import org.eclipse.transformer.action.impl.InputBufferImpl;
 import org.eclipse.transformer.action.impl.SelectionRuleImpl;
 import org.eclipse.transformer.action.impl.SignatureRuleImpl;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import transformer.test.util.CaptureLoggerImpl;
 

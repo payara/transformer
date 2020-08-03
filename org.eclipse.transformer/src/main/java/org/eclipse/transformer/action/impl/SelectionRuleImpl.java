@@ -14,10 +14,11 @@ package org.eclipse.transformer.action.impl;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.eclipse.transformer.TransformProperties;
 import org.eclipse.transformer.action.SelectionRule;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class SelectionRuleImpl implements SelectionRule {
 
@@ -66,7 +67,7 @@ public class SelectionRuleImpl implements SelectionRule {
 	}
 
 	public void debug(String message, Object... parms) {
-		getLogger().debug(message, parms);
+		getLogger().log(Level.FINE, message, parms);
 	}
 
 	//

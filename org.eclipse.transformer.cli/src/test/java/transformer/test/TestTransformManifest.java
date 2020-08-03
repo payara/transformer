@@ -33,7 +33,7 @@ import org.eclipse.transformer.action.impl.SignatureRuleImpl;
 import org.eclipse.transformer.util.InputStreamData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import transformer.test.util.CaptureLoggerImpl;
 

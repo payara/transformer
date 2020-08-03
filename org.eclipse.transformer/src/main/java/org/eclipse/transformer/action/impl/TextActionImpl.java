@@ -24,7 +24,7 @@ import java.io.OutputStreamWriter;
 import org.eclipse.transformer.TransformException;
 import org.eclipse.transformer.action.ActionType;
 import org.eclipse.transformer.util.ByteData;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 import aQute.lib.io.ByteBufferInputStream;
 import aQute.lib.io.ByteBufferOutputStream;

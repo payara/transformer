@@ -14,7 +14,7 @@ package org.eclipse.transformer.action.impl;
 import org.eclipse.transformer.TransformException;
 import org.eclipse.transformer.action.ActionType;
 import org.eclipse.transformer.util.ByteData;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 /**
  * @author jdenise
