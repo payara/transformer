@@ -73,19 +73,13 @@
                         <supportedProjectType>jar</supportedProjectType>
                     </supportedProjectTypes>
                     <instructions>
-                        <Embed-Dependency>
-                            artifactId=org.eclipse.transformer,
-                            artifactId=biz.aQute.bnd.transform,
-                            artifactId=commons-cli,
-                        </Embed-Dependency>
                         <Export-Package>
-                            org.eclipse.transformer,
                             org.eclipse.transformer.*,
-                            aQute.bnd.classfile.*,
-                            aQute.bnd.header,
-                            aQute.bnd.signatures,
+                            aQute.bnd.*,
                             aQute.lib.*,
-                            aQute.libg.*
+                            aQute.libg.*,
+                            aQute.service.reporter,
+                            org.apache.commons.cli
                         </Export-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
