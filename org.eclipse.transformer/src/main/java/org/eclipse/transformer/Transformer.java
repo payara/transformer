@@ -924,8 +924,10 @@ public class Transformer {
 						substitutions = loadExternalProperties("Substitions matching [ " + simpleNameSelector + " ]",
 							relativeSubstitutionsRef);
 					}
-					Map<String, String> substitutionsMap = TransformProperties.convertPropertiesToMap(substitutions); // throws
-																														// IllegalArgumentException
+					Map<String, String> substitutionsMap = TransformProperties.convertPropertiesToMap(substitutions); // throws IllegalArgumentException
+                                        if (invert) {
+                                            substitutionsMap = TransformProperties.invert(substitutionsMap);
+                                        }
 					masterUpdates.put(simpleNameSelector, substitutionsMap);
 				}
 
@@ -950,8 +952,10 @@ public class Transformer {
 
 				Map<String, String> substitutionRefs
 						= TransformProperties.convertPropertiesToMap(perClassConstantProperties); // throws IllegalArgumentException
-
-				Map<String, Map<String, String>> masterUpdates = new HashMap<String, Map<String, String>>();
+				if (invert) {
+					substitutionRefs = TransformProperties.invert(substitutionRefs);
+				}
+				Map<String, Map<String, String>> masterUpdates = new HashMap<>();
 				for (Map.Entry<String, String> substitutionRefEntry : substitutionRefs.entrySet()) {
 					String classSelector = substitutionRefEntry.getKey();
 					String substitutionsRef = FileUtils.normalize(substitutionRefEntry.getValue());
