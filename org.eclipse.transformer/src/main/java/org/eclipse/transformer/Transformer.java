@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2020-2021 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -924,8 +924,10 @@ public class Transformer {
 						substitutions = loadExternalProperties("Substitions matching [ " + simpleNameSelector + " ]",
 							relativeSubstitutionsRef);
 					}
-					Map<String, String> substitutionsMap = TransformProperties.convertPropertiesToMap(substitutions); // throws
-																														// IllegalArgumentException
+					Map<String, String> substitutionsMap = TransformProperties.convertPropertiesToMap(substitutions); // throws IllegalArgumentException
+                                        if (invert) {
+                                            substitutionsMap = TransformProperties.invert(substitutionsMap);
+                                        }
 					masterUpdates.put(simpleNameSelector, substitutionsMap);
 				}
 
@@ -950,8 +952,10 @@ public class Transformer {
 
 				Map<String, String> substitutionRefs
 						= TransformProperties.convertPropertiesToMap(perClassConstantProperties); // throws IllegalArgumentException
-
-				Map<String, Map<String, String>> masterUpdates = new HashMap<String, Map<String, String>>();
+				if (invert) {
+					substitutionRefs = TransformProperties.invert(substitutionRefs);
+				}
+				Map<String, Map<String, String>> masterUpdates = new HashMap<>();
 				for (Map.Entry<String, String> substitutionRefEntry : substitutionRefs.entrySet()) {
 					String classSelector = substitutionRefEntry.getKey();
 					String substitutionsRef = FileUtils.normalize(substitutionRefEntry.getValue());
