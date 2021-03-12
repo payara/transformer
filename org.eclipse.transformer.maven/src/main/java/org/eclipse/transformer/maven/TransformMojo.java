@@ -12,10 +12,12 @@
 package org.eclipse.transformer.maven;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.FileUtils;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -36,6 +38,8 @@ import org.eclipse.transformer.jakarta.JakartaTransformer;
  */
 @Mojo(name = "run", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true, threadSafe = true)
 public class TransformMojo extends AbstractMojo {
+    
+        private final static String TARGET_AS_ORIGIN = "transformed";
 
 	@Parameter(defaultValue = "${project}", readonly = true, required = true)
 	private MavenProject		project;
@@ -64,9 +68,9 @@ public class TransformMojo extends AbstractMojo {
 	@Parameter(property = "transformer-plugin.xml", defaultValue = "")
 	private String				rulesXmlsUri;
 
-	@Parameter(defaultValue = "transformed")
+	@Parameter(defaultValue = TARGET_AS_ORIGIN)
 	private String				classifier;
-
+        
 	@Parameter(defaultValue = "${project.build.directory}", required = true)
 	private File				outputDirectory;
 
@@ -88,6 +92,11 @@ public class TransformMojo extends AbstractMojo {
 		for (final Artifact sourceArtifact : sourceArtifacts) {
 			transform(transformer, sourceArtifact);
 		}
+
+                File testDirectory = getTestDirectory();
+                if (testDirectory.exists()) {
+                    transform(transformer, testDirectory);
+                }
 	}
 
 	/**
@@ -111,10 +120,13 @@ public class TransformMojo extends AbstractMojo {
 		final List<String> args = new ArrayList<>();
 		args.add(sourceArtifact.getFile()
 			.getAbsolutePath());
-		args.add(targetFile.getAbsolutePath());
+                args.add(targetFile.getAbsolutePath());
 
 		if (this.overwrite) {
 			args.add("-o");
+		}
+                if(this.invert) {
+                	args.add("-i");
 		}
 
 		transformer.setArgs(args.toArray(new String[0]));
@@ -124,7 +136,57 @@ public class TransformMojo extends AbstractMojo {
 			throw new MojoFailureException("Transformer failed with an error: " + Transformer.RC_DESCRIPTIONS[rc]);
 		}
 
-		projectHelper.attachArtifact(project, sourceArtifact.getType(), targetClassifier, targetFile);
+                if(TARGET_AS_ORIGIN.equals(classifier)) {
+                    try {
+                        if(sourceArtifact.getFile().isDirectory()) {
+                            FileUtils.deleteDirectory(sourceArtifact.getFile());
+                        } else {
+                            targetFile.delete();
+                        }
+                        targetFile.renameTo(sourceArtifact.getFile());
+                    } catch (IOException ex) {
+                        throw new MojoFailureException("Transformer failed", ex);
+                    }
+                } else {
+                        projectHelper.attachArtifact(project, sourceArtifact.getType(), targetClassifier, targetFile);
+                }
+	}
+        
+        public void transform(final Transformer transformer, final File source) throws MojoFailureException {
+
+		final String targetClassifier = this.classifier;
+
+		final File targetDirectory = new File(source + "-" + targetClassifier);
+
+		final List<String> args = new ArrayList<>();
+		args.add(source.getAbsolutePath());
+                args.add(targetDirectory.getAbsolutePath());
+
+		if (this.overwrite) {
+			args.add("-o");
+		}
+                if(this.invert) {
+                	args.add("-i");
+		}
+
+		transformer.setArgs(args.toArray(new String[0]));
+		int rc = transformer.run();
+
+                if(TARGET_AS_ORIGIN.equals(classifier)) {
+                    try {
+                        if (source.isDirectory()) {
+                            FileUtils.deleteDirectory(source);
+                        } else {
+                            source.delete();
+                        }
+                        targetDirectory.renameTo(source);
+                    } catch (IOException ex) {
+                        throw new MojoFailureException("Transformer failed", ex);
+                    }
+                }
+		if (rc != 0) {
+			throw new MojoFailureException("Transformer failed with an error: " + Transformer.RC_DESCRIPTIONS[rc]);
+		}
 	}
 
 	/**
@@ -159,6 +221,10 @@ public class TransformMojo extends AbstractMojo {
 
 		return artifactList.toArray(new Artifact[0]);
 	}
+
+        public File getTestDirectory() {
+            return new File(project.getBuild().getTestOutputDirectory());
+        }
 
 	private Map<Transformer.AppOption, String> getOptionDefaults() {
 		Map<Transformer.AppOption, String> optionDefaults = new HashMap<>();

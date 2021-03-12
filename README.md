@@ -163,6 +163,27 @@ To use the snapshot transformer maven plugin in your Maven build, you can config
 </pluginRepositories>
 ```
 
+Add the following plugin to `plugins` section of pom.xml:
+
+```
+<plugin>
+    <groupId>org.eclipse.transformer</groupId>
+    <artifactId>org.eclipse.transformer.maven</artifactId>
+    <version>0.2.2-SNAPSHOT</version>
+    <executions>
+        <execution>
+            <phase>test-compile</phase>
+            <configuration>
+                <invert>true</invert>
+            </configuration>
+            <goals>
+                <goal>run</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
 ## Contributing
 
 If you would like to contribute to Transformer, check out the [contributing guide](CONTRIBUTING.md) for more information.
