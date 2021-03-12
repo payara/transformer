@@ -21,8 +21,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>fish.payara.transformer</groupId>
-    <artifactId>payara-transformer</artifactId>
+    <artifactId>org.eclipse.transformer.payara</artifactId>
     <description>Eclipse Transformer for Payara Platform</description>
     <name>${project.groupId}:${project.artifactId}</name>
     
@@ -136,56 +135,43 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>payara-nexus-artifacts</id>
+            <name>Payara Nexus Artifacts</name>
+            <url>https://nexus.payara.fish/content/repositories/payara-artifacts</url>
+        </repository>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <id>payara-nexus-artifacts</id>
+            <url>https://nexus.payara.fish/repository/payara-artifacts</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <profiles>
         <profile>
-            <id>payara-enterprise</id>
-            <distributionManagement>
-                <repository>
-                    <id>payara-enterprise</id>
-                    <name>Payara Enterprise Nexus</name>
-                    <url>https://nexus.payara.fish/content/repositories/payara-enterprise</url>
-                </repository>
-            </distributionManagement>
-            <repositories>
-                <repository>
-                    <id>payara-enterprise</id>
-                    <name>Payara Enterprise Nexus</name>
-                    <url>https://nexus.payara.fish/content/repositories/payara-enterprise</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-        </profile>
-        <profile>
-            <id>payara-community</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-                <repository>
-                    <id>ossrh</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
+            <id>release</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
