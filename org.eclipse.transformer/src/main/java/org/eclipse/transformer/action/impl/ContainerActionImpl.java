@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2020-2021 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -177,6 +179,8 @@ public abstract class ContainerActionImpl extends ActionImpl implements Containe
 
 		String prevName = null;
 		String inputName = null;
+                
+		Set<String> processedFile = new HashSet<>();
 
 		try {
 			byte[] buffer = new byte[FileUtils.BUFFER_ADJUSTMENT];
@@ -184,6 +188,11 @@ public abstract class ContainerActionImpl extends ActionImpl implements Containe
 			ZipEntry inputEntry;
 			while ((inputEntry = zipInputStream.getNextEntry()) != null) {
 				inputName = inputEntry.getName();
+				if(processedFile.contains(inputName)) {
+				    continue;
+				} else {
+				    processedFile.add(inputName);
+				}
 				long inputLength = inputEntry.getSize();
 
 				debug("[ {}.{} ] [ {} ] Size [ {} ]", getClass().getSimpleName(), "apply", inputName, inputLength);
