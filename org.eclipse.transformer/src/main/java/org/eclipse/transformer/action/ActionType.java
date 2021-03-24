@@ -27,6 +27,7 @@ public enum ActionType {
 	RAR,
 	EAR,
 	JAVA,
+	TLD,
 	DIRECTORY,
 	PROPERTIES;
 
