@@ -64,6 +64,7 @@ import aQute.lib.utf8properties.UTF8Properties;
 import aQute.libg.uri.URIUtil;
 import java.util.logging.Level;
 import org.eclipse.transformer.action.impl.TLDActionImpl;
+import org.eclipse.transformer.action.impl.JSPActionImpl;
 
 public class Transformer {
 	// TODO: Make this an enum?
@@ -1254,6 +1255,7 @@ public class Transformer {
 				ClassActionImpl classAction = useRootAction.addUsing(ClassActionImpl::new);
 				JavaActionImpl javaAction = useRootAction.addUsing(JavaActionImpl::new);
 				TLDActionImpl tldAction = useRootAction.addUsing(TLDActionImpl::new);
+				JSPActionImpl jspAction = useRootAction.addUsing(JSPActionImpl::new);
 				ServiceLoaderConfigActionImpl serviceConfigAction = useRootAction
 					.addUsing(ServiceLoaderConfigActionImpl::new);
 				ManifestActionImpl manifestAction = useRootAction.addUsing(ManifestActionImpl::newManifestAction);
@@ -1279,6 +1281,7 @@ public class Transformer {
 				directoryAction.addAction(classAction);
 				directoryAction.addAction(javaAction);
 				directoryAction.addAction(tldAction);
+				directoryAction.addAction(jspAction);
 				directoryAction.addAction(serviceConfigAction);
 				directoryAction.addAction(manifestAction);
 				directoryAction.addAction(featureAction);
@@ -1302,6 +1305,7 @@ public class Transformer {
 				warAction.addAction(classAction);
 				warAction.addAction(javaAction);
 				warAction.addAction(tldAction);
+				warAction.addAction(jspAction);
 				warAction.addAction(serviceConfigAction);
 				warAction.addAction(manifestAction);
 				warAction.addAction(featureAction);
@@ -1328,6 +1332,7 @@ public class Transformer {
 				zipAction.addAction(classAction);
 				zipAction.addAction(javaAction);
 				zipAction.addAction(tldAction);
+				zipAction.addAction(jspAction);
 				zipAction.addAction(serviceConfigAction);
 				zipAction.addAction(manifestAction);
 				zipAction.addAction(featureAction);
