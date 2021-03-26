@@ -63,6 +63,7 @@ import aQute.lib.io.IO;
 import aQute.lib.utf8properties.UTF8Properties;
 import aQute.libg.uri.URIUtil;
 import java.util.logging.Level;
+import org.eclipse.transformer.action.impl.TLDActionImpl;
 import org.eclipse.transformer.action.impl.JSPActionImpl;
 
 public class Transformer {
@@ -1253,6 +1254,7 @@ public class Transformer {
 
 				ClassActionImpl classAction = useRootAction.addUsing(ClassActionImpl::new);
 				JavaActionImpl javaAction = useRootAction.addUsing(JavaActionImpl::new);
+				TLDActionImpl tldAction = useRootAction.addUsing(TLDActionImpl::new);
 				JSPActionImpl jspAction = useRootAction.addUsing(JSPActionImpl::new);
 				ServiceLoaderConfigActionImpl serviceConfigAction = useRootAction
 					.addUsing(ServiceLoaderConfigActionImpl::new);
@@ -1278,6 +1280,7 @@ public class Transformer {
 
 				directoryAction.addAction(classAction);
 				directoryAction.addAction(javaAction);
+				directoryAction.addAction(tldAction);
 				directoryAction.addAction(jspAction);
 				directoryAction.addAction(serviceConfigAction);
 				directoryAction.addAction(manifestAction);
@@ -1301,6 +1304,7 @@ public class Transformer {
 
 				warAction.addAction(classAction);
 				warAction.addAction(javaAction);
+				warAction.addAction(tldAction);
 				warAction.addAction(jspAction);
 				warAction.addAction(serviceConfigAction);
 				warAction.addAction(manifestAction);
@@ -1327,6 +1331,7 @@ public class Transformer {
 
 				zipAction.addAction(classAction);
 				zipAction.addAction(javaAction);
+				zipAction.addAction(tldAction);
 				zipAction.addAction(jspAction);
 				zipAction.addAction(serviceConfigAction);
 				zipAction.addAction(manifestAction);
