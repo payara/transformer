@@ -28,6 +28,7 @@ public enum ActionType {
 	EAR,
 	JAVA,
 	TLD,
+	TAG,
 	JSP,
 	DIRECTORY,
 	PROPERTIES;
