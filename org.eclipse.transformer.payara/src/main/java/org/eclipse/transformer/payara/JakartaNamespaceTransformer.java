@@ -1,5 +1,5 @@
 /** ******************************************************************************
- * Copyright (c) 2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2020-2021 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -12,9 +12,10 @@ package org.eclipse.transformer.payara;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.transformer.TransformException;
@@ -58,10 +59,12 @@ public class JakartaNamespaceTransformer extends Transformer {
     @Override
     public int run() {
         try {
-            setArgs(new String[]{
-                "--" + Transformer.AppOption.INVERT.getLongTag(), String.valueOf(invert),
-                "--" + Transformer.AppOption.OVERWRITE.getLongTag(), "true"
-            });
+            List<String> args = new ArrayList<>();
+            if (invert) {
+                args.add("--" + Transformer.AppOption.INVERT.getLongTag());
+            }
+            args.add("--" + Transformer.AppOption.OVERWRITE.getLongTag());
+            setArgs(args.toArray(new String[0]));
             setParsedArgs();
         } catch (ParseException e) {
             errorPrint("Exception parsing command line arguments: %s", e);
