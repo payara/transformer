@@ -22,7 +22,7 @@
 	<version>${revision}</version>
 
 	<properties>
-		<revision>0.2.7</revision>
+		<revision>0.2.8-SNAPSHOT</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -43,6 +43,8 @@
 		<module>org.eclipse.transformer.cli</module>
 		<module>org.eclipse.transformer.maven</module>
 		<module>org.eclipse.transformer.payara</module>
+		<module>org.eclipse.transformer.payara.deployment.api</module>
+		<module>org.eclipse.transformer.payara.deployment.impl</module>
 	</modules>
 
 	<url>https://projects.eclipse.org/projects/technology.transformer</url>
