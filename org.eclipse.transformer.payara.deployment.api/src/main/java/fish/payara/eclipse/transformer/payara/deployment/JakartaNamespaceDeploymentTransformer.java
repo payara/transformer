@@ -51,7 +51,7 @@ public interface JakartaNamespaceDeploymentTransformer {
 
 	default boolean isJakartaEEApplication(Types types) {
 		// Quick check for the most common Javax/Jakarta APIs
-		for (String _class : JakartaNamespaceDeploymentTransformerConstants.commonJakartaClasses) {
+		for (String _class : JakartaNamespaceDeploymentTransformerConstants.COMMON_JAKARTA_CLASSES) {
 			if (types.getBy(_class) != null) {
 				return false;
 			}

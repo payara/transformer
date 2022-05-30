@@ -43,7 +43,7 @@ public class JakartaNamespaceDeploymentTransformerConstants {
 
 	public static final String TRANSFORM_NAMESPACE = "fish.payara.deployment.transform.namespace";
 
-	public static final String[] commonJakartaClasses = {
+	public static final String[] COMMON_JAKARTA_CLASSES = {
 		"jakarta.inject.Inject",
 		"jakarta.servlet.http.HttpServlet",
 		"jakarta.ws.rs.core.Application",
