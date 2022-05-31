@@ -37,16 +37,54 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.eclipse.transformer.payara.deployment;
+package fish.payara.deployment.transformer;
 
-public class JakartaNamespaceDeploymentTransformerConstants {
+import com.sun.enterprise.util.LocalStringManagerImpl;
+import org.eclipse.transformer.payara.JakartaNamespaceTransformer;
+import org.glassfish.api.admin.AdminCommandContext;
 
-	public static final String TRANSFORM_NAMESPACE = "fish.payara.deployment.transform.namespace";
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 
-	public static final String[] COMMON_JAKARTA_CLASSES = {
-		"jakarta.inject.Inject",
-		"jakarta.servlet.http.HttpServlet",
-		"jakarta.ws.rs.core.Application",
-		"jakarta.persistence.Entity"
-	};
+import static org.eclipse.transformer.Transformer.SUCCESS_RC;
+
+/**
+ * Transforms jakarta.* namespace to javax.* and vice-versa.
+ *
+ * @author gaurav.gupta@payara.fish
+ */
+public class JakartaNamespaceDeploymentTransformerImpl implements JakartaNamespaceDeploymentTransformer {
+
+	private static final LocalStringManagerImpl localStrings = new LocalStringManagerImpl(
+		JakartaNamespaceDeploymentTransformerImpl.class);
+
+	public File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws
+			IOException {
+		JakartaNamespaceTransformer transformer = new JakartaNamespaceTransformer(context.getLogger(), path, false);
+		int result = transformer.run();
+		if (result == SUCCESS_RC) {
+			File output = transformer.getOutput();
+			Path newPath = output.toPath();
+			if (!isDirectoryDeployed) {
+				Files.walk(path.toPath())
+					.sorted(Comparator.reverseOrder())
+					.map(Path::toFile)
+					.forEach(File::delete);
+				newPath = Files.move(output.toPath(), path.toPath());
+				if (newPath == null) {
+					String msg = localStrings.getLocalString("application.namespace.transform.failed", "Application namespace transformation failed");
+					context.getActionReport().failure(context.getLogger(), msg);
+					return null;
+				}
+			}
+			return newPath.toFile();
+		} else {
+			String msg = localStrings.getLocalString("application.namespace.transform.failed", "Application namespace transformation failed");
+			context.getActionReport().failure(context.getLogger(), msg);
+			return null;
+		}
+	}
 }

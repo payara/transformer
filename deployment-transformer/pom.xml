@@ -47,8 +47,8 @@
 
 	<!-- Explicitly not depending on parent for now - this requires JDK 11 -->
 
-	<groupId>fish.payara.eclipse.transformer</groupId>
-	<artifactId>org.eclipse.transformer.payara.deployment.parent</artifactId>
+	<groupId>fish.payara.deployment.transformer</groupId>
+	<artifactId>deployment-transformer-parent</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
@@ -64,8 +64,8 @@
 		<payara.version>6.2022.1.Alpha3-SNAPSHOT</payara.version>
 
 		<org.eclipse.transformer.payara.version>0.2.7</org.eclipse.transformer.payara.version>
-		<org.eclipse.transformer.payara.deployment.api.version>1.0-SNAPSHOT</org.eclipse.transformer.payara.deployment.api.version>
-		<org.eclipse.transformer.payara.deployment.impl.version>1.0-SNAPSHOT</org.eclipse.transformer.payara.deployment.impl.version>
+		<deployment.transformer.api.version>1.0-SNAPSHOT</deployment.transformer.api.version>
+		<deployment.transformer.impl.version>1.0-SNAPSHOT</deployment.transformer.impl.version>
 	</properties>
 
 	<distributionManagement>
@@ -115,8 +115,8 @@
 	</pluginRepositories>
 
 	<modules>
-		<module>org.eclipse.transformer.payara.deployment.api</module>
-		<module>org.eclipse.transformer.payara.deployment.impl</module>
+		<module>deployment-transformer-api</module>
+		<module>deployment-transformer-impl</module>
 	</modules>
 
 	<dependencyManagement>
@@ -133,9 +133,9 @@
 				<version>${org.eclipse.transformer.payara.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>fish.payara.eclipse.transformer</groupId>
-				<artifactId>org.eclipse.transformer.payara.deployment.api</artifactId>
-				<version>${org.eclipse.transformer.payara.deployment.api.version}</version>
+				<groupId>fish.payara.deployment.transformer</groupId>
+				<artifactId>deployment-transformer-api</artifactId>
+				<version>${deployment.transformer.api.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
