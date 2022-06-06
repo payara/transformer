@@ -40,6 +40,7 @@
 package fish.payara.deployment.transformer;
 
 import com.sun.enterprise.util.LocalStringManagerImpl;
+import fish.payara.deployment.transformer.api.JakartaNamespaceDeploymentTransformer;
 import org.eclipse.transformer.payara.JakartaNamespaceTransformer;
 import org.glassfish.api.admin.AdminCommandContext;
 

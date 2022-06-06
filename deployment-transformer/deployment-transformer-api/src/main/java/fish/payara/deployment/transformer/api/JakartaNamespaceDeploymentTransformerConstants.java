@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,26 +37,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.deployment.transformer;
+package fish.payara.deployment.transformer.api;
 
-import org.glassfish.api.admin.AdminCommandContext;
-import org.glassfish.hk2.classmodel.reflect.Types;
+public class JakartaNamespaceDeploymentTransformerConstants {
 
-import java.io.File;
-import java.io.IOException;
+	public static final String TRANSFORM_NAMESPACE = "fish.payara.deployment.transform.namespace";
 
-public interface JakartaNamespaceDeploymentTransformer {
-
-	File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws IOException;
-
-	default boolean isJakartaEEApplication(Types types) {
-		// Quick check for the most common Javax/Jakarta APIs
-		for (String _class : JakartaNamespaceDeploymentTransformerConstants.COMMON_JAKARTA_CLASSES) {
-			if (types.getBy(_class) != null) {
-				return false;
-			}
-		}
-		return true;
-	}
-
+	public static final String[] COMMON_JAKARTA_CLASSES = {
+		"jakarta.inject.Inject",
+		"jakarta.servlet.http.HttpServlet",
+		"jakarta.ws.rs.core.Application",
+		"jakarta.persistence.Entity"
+	};
 }
