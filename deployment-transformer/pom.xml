@@ -61,7 +61,7 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 
-		<payara.version>6.2022.1.Alpha3-SNAPSHOT</payara.version>
+		<payara.version>6.2022.1.Alpha3</payara.version>
 
 		<org.eclipse.transformer.payara.version>0.2.7</org.eclipse.transformer.payara.version>
 		<deployment.transformer.api.version>1.0-SNAPSHOT</deployment.transformer.api.version>
