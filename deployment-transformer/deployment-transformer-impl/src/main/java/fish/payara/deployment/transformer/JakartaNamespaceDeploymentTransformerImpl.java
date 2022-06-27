@@ -43,6 +43,7 @@ import com.sun.enterprise.util.LocalStringManagerImpl;
 import fish.payara.deployment.transformer.api.JakartaNamespaceDeploymentTransformer;
 import org.eclipse.transformer.payara.JakartaNamespaceTransformer;
 import org.glassfish.api.admin.AdminCommandContext;
+import org.glassfish.hk2.classmodel.reflect.Types;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +62,13 @@ public class JakartaNamespaceDeploymentTransformerImpl implements JakartaNamespa
 
     private static final LocalStringManagerImpl localStrings = new LocalStringManagerImpl(
             JakartaNamespaceDeploymentTransformerImpl.class);
+
+    private static final String[] COMMON_JAKARTA_CLASSES = {
+            "jakarta.inject.Inject",
+            "jakarta.servlet.http.HttpServlet",
+            "jakarta.ws.rs.core.Application",
+            "jakarta.persistence.Entity"
+    };
 
     public File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws
             IOException {
@@ -87,5 +95,16 @@ public class JakartaNamespaceDeploymentTransformerImpl implements JakartaNamespa
             context.getActionReport().failure(context.getLogger(), msg);
             return null;
         }
+    }
+
+    @Override
+    public boolean isJakartaEEApplication(Types types) {
+        // Quick check for the most common Jakarta APIs
+        for (String commonJakartaClass : COMMON_JAKARTA_CLASSES) {
+            if (types.getBy(commonJakartaClass) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 }
