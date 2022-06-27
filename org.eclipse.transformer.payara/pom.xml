@@ -24,13 +24,13 @@
     <artifactId>org.eclipse.transformer.payara</artifactId>
     <description>Eclipse Transformer for Payara Platform</description>
     <name>${project.groupId}:${project.artifactId}</name>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.eclipse.transformer</groupId>
             <artifactId>org.eclipse.transformer</artifactId>
             <version>${revision}</version>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.eclipse.transformer</groupId>
             <artifactId>org.eclipse.transformer.cli</artifactId>
@@ -45,7 +45,7 @@
             <artifactId>commons-cli</artifactId>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -177,5 +177,5 @@
             </build>
         </profile>
     </profiles>
-    
+
 </project>
