@@ -47,16 +47,16 @@ import java.io.IOException;
 
 public interface JakartaNamespaceDeploymentTransformer {
 
-	File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws IOException;
+    File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws IOException;
 
-	default boolean isJakartaEEApplication(Types types) {
-		// Quick check for the most common Jakarta APIs
-		for (String _class : JakartaNamespaceDeploymentTransformerConstants.COMMON_JAKARTA_CLASSES) {
-			if (types.getBy(_class) != null) {
-				return true;
-			}
-		}
-		return false;
-	}
+    default boolean isJakartaEEApplication(Types types) {
+        // Quick check for the most common Jakarta APIs
+        for (String _class : JakartaNamespaceDeploymentTransformerConstants.COMMON_JAKARTA_CLASSES) {
+            if (types.getBy(_class) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
