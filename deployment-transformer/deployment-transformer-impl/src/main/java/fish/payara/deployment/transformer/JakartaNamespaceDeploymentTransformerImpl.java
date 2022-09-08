@@ -70,9 +70,16 @@ public class JakartaNamespaceDeploymentTransformerImpl implements JakartaNamespa
             "jakarta.persistence.Entity"
     };
 
+    @Override
     public File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws
             IOException {
-        JakartaNamespaceTransformer transformer = new JakartaNamespaceTransformer(context.getLogger(), path, false);
+        return this.transformApplication(path, context, isDirectoryDeployed, false);
+    }
+
+    @Override
+    public File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed, boolean invert) throws
+            IOException {
+        JakartaNamespaceTransformer transformer = new JakartaNamespaceTransformer(context.getLogger(), path, invert);
         int result = transformer.run();
         if (result == SUCCESS_RC) {
             File output = transformer.getOutput();

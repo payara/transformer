@@ -909,30 +909,38 @@ public class Transformer {
 				Map<String, String> substitutionRefs = TransformProperties.convertPropertiesToMap(textMasterProperties); // throws
 																															// IllegalArgumentException
 
-				Map<String, Map<String, String>> masterUpdates = new HashMap<>();
-				for (Map.Entry<String, String> substitutionRefEntry : substitutionRefs.entrySet()) {
-					String simpleNameSelector = substitutionRefEntry.getKey();
-					String substitutionsRef = FileUtils.normalize(substitutionRefEntry.getValue());
+                                Map<String, Map<String, String>> masterUpdates = new HashMap<>();
+                                for (Map.Entry<String, String> substitutionRefEntry : substitutionRefs.entrySet()) {
+                                    String simpleNameSelector = substitutionRefEntry.getKey();
+                                    for (String substitutionsRef : substitutionRefEntry.getValue().split(",")) {
+                                        substitutionsRef = FileUtils.normalize(substitutionsRef);
 
-					UTF8Properties substitutions;
-					if (masterTextRef == null) {
-						substitutions = loadInternalProperties("Substitions matching [ " + simpleNameSelector + " ]",
-							substitutionsRef);
-					} else {
-						String relativeSubstitutionsRef = relativize(substitutionsRef, masterTextRef);
-						if (!relativeSubstitutionsRef.equals(substitutionsRef)) {
-							dual_info("Adjusted substition reference from [ %s ] to [ %s ]", substitutionsRef,
-								relativeSubstitutionsRef);
-						}
-						substitutions = loadExternalProperties("Substitions matching [ " + simpleNameSelector + " ]",
-							relativeSubstitutionsRef);
-					}
-					Map<String, String> substitutionsMap = TransformProperties.convertPropertiesToMap(substitutions); // throws IllegalArgumentException
+                                        UTF8Properties substitutions;
+                                        if (masterTextRef == null) {
+                                            substitutions = loadInternalProperties("Substitions matching [ " + simpleNameSelector + " ]",
+                                                    substitutionsRef);
+                                        } else {
+                                            String relativeSubstitutionsRef = relativize(substitutionsRef, masterTextRef);
+                                            if (!relativeSubstitutionsRef.equals(substitutionsRef)) {
+                                                dual_info("Adjusted substition reference from [ %s ] to [ %s ]", substitutionsRef,
+                                                        relativeSubstitutionsRef);
+                                            }
+                                            substitutions = loadExternalProperties("Substitions matching [ " + simpleNameSelector + " ]",
+                                                    relativeSubstitutionsRef);
+                                        }
+                                        Map<String, String> substitutionsMap = TransformProperties.convertPropertiesToMap(substitutions); // throws IllegalArgumentException
                                         if (invert) {
                                             substitutionsMap = TransformProperties.invert(substitutionsMap);
                                         }
-					masterUpdates.put(simpleNameSelector, substitutionsMap);
-				}
+                                        Map<String, String> val = masterUpdates.get(simpleNameSelector);
+                                        if (val == null) {
+                                            masterUpdates.put(simpleNameSelector, substitutionsMap);
+                                        } else {
+                                            val.putAll(substitutionsMap);
+                                        }
+                                    }
+
+                                }
 
 				masterTextUpdates = masterUpdates;
 				dual_info("Text files will be updated");
