@@ -49,6 +49,8 @@ public interface JakartaNamespaceDeploymentTransformer {
 
     File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws IOException;
 
+    File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed, boolean invert) throws IOException;
+
     boolean isJakartaEEApplication(Types types);
 
 }

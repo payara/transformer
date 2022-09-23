@@ -450,10 +450,17 @@ public class SignatureRuleImpl implements SignatureRule {
 				return wildcardEntry.getValue();
 			}
 		}
+                
+        for (Map.Entry<Pattern, Map<String, String>> wildcardEntry : getWildCardTextUpdates().entrySet()) {
+			if (matches(wildcardEntry.getKey(), inputFileName)) {
+				return wildcardEntry.getValue();
+			}
+		}
 
 		return null;
 	}
 
+        private String RESERVED_TEXT = "<?xml";
 	public String replaceText(String inputFileName, String text) {
 		Map<String, String> substitutions = getTextSubstitutions(inputFileName);
 		if (substitutions == null) {
@@ -462,31 +469,37 @@ public class SignatureRuleImpl implements SignatureRule {
 		}
 
 		String initialText = text;
+                if(text.trim().startsWith(RESERVED_TEXT)) {
+                     return null;
+                }
 
-		for (Map.Entry<String, String> entry : substitutions.entrySet()) {
-			String key = entry.getKey();
-			int keyLen = key.length();
+            for (Map.Entry<String, String> entry : substitutions.entrySet()) {
+                String key = entry.getKey();
+                int keyLen = key.length();
+                
+                String value = entry.getValue();
+                int valueLen = value.length();
+                if (key.contains("[")) {
+                    text = Pattern.compile(key).matcher(text).replaceAll(value);
+                } else {
+                    int textLimit = text.length() - keyLen;
 
-			int textLimit = text.length() - keyLen;
+                    int lastMatchEnd = 0;
+                    while (lastMatchEnd <= textLimit) {
+                        int matchStart = text.indexOf(key, lastMatchEnd);
+                        if (matchStart == -1) {
+                            break;
+                        }
 
-			int lastMatchEnd = 0;
-			while (lastMatchEnd <= textLimit) {
-				int matchStart = text.indexOf(key, lastMatchEnd);
-				if (matchStart == -1) {
-					break;
-				}
+                        String head = text.substring(0, matchStart);
+                        String tail = text.substring(matchStart + keyLen);
+                        text = head + value + tail;
 
-				String value = entry.getValue();
-				int valueLen = value.length();
-
-				String head = text.substring(0, matchStart);
-				String tail = text.substring(matchStart + keyLen);
-				text = head + value + tail;
-
-				lastMatchEnd = matchStart + valueLen;
-				textLimit += (valueLen - keyLen);
-			}
-		}
+                        lastMatchEnd = matchStart + valueLen;
+                        textLimit += (valueLen - keyLen);
+                    }
+                }
+            }
 
 		if (initialText == text) {
 			return null;

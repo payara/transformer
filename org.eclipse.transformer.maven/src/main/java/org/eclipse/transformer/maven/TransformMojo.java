@@ -49,6 +49,12 @@ public class TransformMojo extends AbstractMojo {
 
 	@Parameter(defaultValue = "true", property = "transformer-plugin.overwrite", required = true)
 	private Boolean				overwrite;
+        
+	@Parameter(defaultValue = "true", property = "transformer-plugin.mainSource", required = true)
+	private Boolean				mainSource;
+        
+	@Parameter(defaultValue = "true", property = "transformer-plugin.testSource", required = true)
+	private Boolean				testSource;
 
 	@Parameter(property = "transformer-plugin.renames", defaultValue = "")
 	private String				rulesRenamesUri;
@@ -85,19 +91,22 @@ public class TransformMojo extends AbstractMojo {
 	 *             execution
 	 */
 	@Override
-	public void execute() throws MojoFailureException {
-		final Transformer transformer = getTransformer();
+        public void execute() throws MojoFailureException {
+             final Transformer transformer = getTransformer();
 
-		final Artifact[] sourceArtifacts = getSourceArtifacts();
-		for (final Artifact sourceArtifact : sourceArtifacts) {
-			transform(transformer, sourceArtifact);
-		}
-
-                File testDirectory = getTestDirectory();
-                if (testDirectory.exists()) {
-                    transform(transformer, testDirectory);
-                }
-	}
+             if (mainSource) {
+                 final Artifact[] sourceArtifacts = getSourceArtifacts();
+                 for (final Artifact sourceArtifact : sourceArtifacts) {
+                     transform(transformer, sourceArtifact);
+                 }
+             }
+             if (testSource) {
+                 File testDirectory = getTestDirectory();
+                 if (testDirectory.exists()) {
+                     transform(transformer, testDirectory);
+                 }
+             }
+         }
 
 	/**
 	 * This runs the transformation process on the source artifact with the
