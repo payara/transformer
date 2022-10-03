@@ -147,11 +147,19 @@
 						<goals>
 							<goal>single</goal>
 						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>src/assembly/distribution.xml</descriptor>
-							</descriptors>
-						</configuration>
+                                                <configuration>
+                                                    <descriptors>
+                                                        <descriptor>src/assembly/distribution.xml</descriptor>
+                                                    </descriptors>
+                                                    <archive>
+                                                        <manifest>
+                                                            <mainClass>org.eclipse.transformer.jakarta.JakartaTransformer</mainClass>
+                                                        </manifest>
+                                                        <manifestEntries>
+                                                            <Class-Path>${project.build.finalName}.jar</Class-Path>
+                                                        </manifestEntries>
+                                                    </archive>
+                                                </configuration>
 					</execution>
 				</executions>
 			</plugin>
