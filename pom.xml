@@ -14,8 +14,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.eclipse.transformer</groupId>
-	<artifactId>org.eclipse.transformer.parent</artifactId>
+	<groupId>fish.payara.transformer</groupId>
+	<artifactId>fish.payara.transformer.parent</artifactId>
 	<description>Eclipse Transformer Parent</description>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<packaging>pom</packaging>
@@ -39,10 +39,10 @@
 	</properties>
 
 	<modules>
-		<module>org.eclipse.transformer</module>
-		<module>org.eclipse.transformer.cli</module>
-		<module>org.eclipse.transformer.maven</module>
-		<module>org.eclipse.transformer.payara</module>
+		<module>fish.payara.transformer</module>
+		<module>fish.payara.transformer.cli</module>
+		<module>fish.payara.transformer.maven</module>
+		<module>fish.payara.transformer.payara</module>
 	</modules>
 
 	<url>https://projects.eclipse.org/projects/technology.transformer</url>

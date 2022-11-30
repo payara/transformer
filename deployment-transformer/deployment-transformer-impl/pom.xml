@@ -69,8 +69,8 @@
             <artifactId>deployment-transformer-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.transformer</groupId>
-            <artifactId>org.eclipse.transformer.payara</artifactId>
+            <groupId>fish.payara.transformer</groupId>
+            <artifactId>fish.payara.transformer.payara</artifactId>
         </dependency>
     </dependencies>
 

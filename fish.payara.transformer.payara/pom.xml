@@ -15,25 +15,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.eclipse.transformer</groupId>
-        <artifactId>org.eclipse.transformer.parent</artifactId>
+        <groupId>fish.payara.transformer</groupId>
+        <artifactId>fish.payara.transformer.parent</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>org.eclipse.transformer.payara</artifactId>
+    <artifactId>fish.payara.transformer.payara</artifactId>
     <description>Eclipse Transformer for Payara Platform</description>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.transformer</groupId>
-            <artifactId>org.eclipse.transformer</artifactId>
+            <groupId>fish.payara.transformer</groupId>
+            <artifactId>fish.payara.transformer</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.transformer</groupId>
-            <artifactId>org.eclipse.transformer.cli</artifactId>
+            <groupId>fish.payara.transformer</groupId>
+            <artifactId>fish.payara.transformer.cli</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

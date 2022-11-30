@@ -63,7 +63,7 @@
 
         <payara.version>6.2022.1.Alpha4</payara.version>
 
-        <org.eclipse.transformer.payara.version>0.2.10-SNAPSHOT</org.eclipse.transformer.payara.version>
+        <fish.payara.transformer.payara.version>0.2.10-SNAPSHOT</fish.payara.transformer.payara.version>
         <deployment.transformer.api.version>1.2-SNAPSHOT</deployment.transformer.api.version>
         <deployment.transformer.impl.version>1.2-SNAPSHOT</deployment.transformer.impl.version>
     </properties>
@@ -128,9 +128,9 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.transformer</groupId>
-                <artifactId>org.eclipse.transformer.payara</artifactId>
-                <version>${org.eclipse.transformer.payara.version}</version>
+                <groupId>fish.payara.transformer</groupId>
+                <artifactId>fish.payara.transformer.payara</artifactId>
+                <version>${fish.payara.transformer.payara.version}</version>
             </dependency>
             <dependency>
                 <groupId>fish.payara.deployment.transformer</groupId>
