@@ -13,10 +13,8 @@ package org.eclipse.transformer.maven;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.*;
 import org.apache.commons.io.FileUtils;
 
 import org.apache.maven.artifact.Artifact;
@@ -38,8 +36,10 @@ import org.eclipse.transformer.jakarta.JakartaTransformer;
  */
 @Mojo(name = "run", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true, threadSafe = true)
 public class TransformMojo extends AbstractMojo {
-    
-        private final static String TARGET_AS_ORIGIN = "transformed";
+
+	private final static String TARGET_AS_ORIGIN = "transformed";
+
+	private final static Logger log = Logger.getLogger(TransformMojo.class.getName());
 
 	@Parameter(defaultValue = "${project}", readonly = true, required = true)
 	private MavenProject		project;
@@ -49,10 +49,10 @@ public class TransformMojo extends AbstractMojo {
 
 	@Parameter(defaultValue = "true", property = "transformer-plugin.overwrite", required = true)
 	private Boolean				overwrite;
-        
+
 	@Parameter(defaultValue = "true", property = "transformer-plugin.mainSource", required = true)
 	private Boolean				mainSource;
-        
+
 	@Parameter(defaultValue = "true", property = "transformer-plugin.testSource", required = true)
 	private Boolean				testSource;
 
@@ -71,12 +71,18 @@ public class TransformMojo extends AbstractMojo {
 	@Parameter(property = "transformer-plugin.per-class-constant", defaultValue = "")
 	private String rulesPerClassConstantUri;
 
+	@Parameter(property = "transformer-plugin.selectedSource", defaultValue = "")
+	private String selectedSource;
+
+	@Parameter(property = "transformer-plugin.selectedTargetDirectory", defaultValue = "")
+	private String selectedTargetDirectory;
+
 	@Parameter(property = "transformer-plugin.xml", defaultValue = "")
 	private String				rulesXmlsUri;
 
 	@Parameter(defaultValue = TARGET_AS_ORIGIN)
 	private String				classifier;
-        
+
 	@Parameter(defaultValue = "${project.build.directory}", required = true)
 	private File				outputDirectory;
 
@@ -126,10 +132,26 @@ public class TransformMojo extends AbstractMojo {
 		final File targetFile = new File(outputDirectory, sourceArtifact.getArtifactId() + "-" + targetClassifier + "-"
 			+ sourceArtifact.getVersion() + "." + sourceArtifact.getType());
 
+		//processing new parameter to select source file and target directory to execute transform operation
+		// from maven command line
+		log.info("Processing custom parameters for source and target file");
+		Properties properties = System.getProperties();
 		final List<String> args = new ArrayList<>();
-		args.add(sourceArtifact.getFile()
-			.getAbsolutePath());
-                args.add(targetFile.getAbsolutePath());
+		selectedSource = properties.getProperty("selectedSource");
+		if(selectedSource != null && !selectedSource.isEmpty()) {
+			log.info("setting custom source file:"+selectedSource);
+			args.add(selectedSource);
+		} else {
+			args.add(sourceArtifact.getFile().getAbsolutePath());
+		}
+
+		selectedTargetDirectory = properties.getProperty("selectedTargetDirectory");
+		if(selectedTargetDirectory != null && !selectedTargetDirectory.isEmpty()) {
+			log.info("setting custom target file:"+selectedTargetDirectory);
+			args.add(selectedTargetDirectory);
+		} else {
+			args.add(targetFile.getAbsolutePath());
+		}
 
 		if (this.overwrite) {
 			args.add("-o");
@@ -139,6 +161,7 @@ public class TransformMojo extends AbstractMojo {
 		}
 
 		transformer.setArgs(args.toArray(new String[0]));
+		log.info("configured Args:"+args);
 		int rc = transformer.run();
 
 		if (rc != 0) {
@@ -160,7 +183,7 @@ public class TransformMojo extends AbstractMojo {
                         projectHelper.attachArtifact(project, sourceArtifact.getType(), targetClassifier, targetFile);
                 }
 	}
-        
+
         public void transform(final Transformer transformer, final File source) throws MojoFailureException {
 
 		final String targetClassifier = this.classifier;
@@ -279,5 +302,13 @@ public class TransformMojo extends AbstractMojo {
 
 	void setOutputDirectory(File outputDirectory) {
 		this.outputDirectory = outputDirectory;
+	}
+
+	public void setSelectedSource(String selectedSource) {
+		this.selectedSource = selectedSource;
+	}
+
+	public void setSelectedTargetDirectory(String selectedTargetDirectory) {
+		this.selectedTargetDirectory = selectedTargetDirectory;
 	}
 }
