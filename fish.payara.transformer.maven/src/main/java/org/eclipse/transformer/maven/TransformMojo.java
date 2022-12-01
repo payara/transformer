@@ -9,15 +9,22 @@
  * SPDX-License-Identifier: (EPL-2.0 OR Apache-2.0)
  ********************************************************************************/
 
-// Portions Copyright [2022] Payara Foundation and/or affiliates
+// Copyright (c) 2020 Contributors to the Eclipse Foundation
+// Copyright (c) 2022 Payara Foundation and/or its affiliates
 
 package org.eclipse.transformer.maven;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.*;
-import java.util.logging.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 import org.apache.maven.artifact.Artifact;
