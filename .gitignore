@@ -3,6 +3,7 @@
 /.recommenders/
 .classpath
 bin/
+.project
 
 # OS
 .DS_Store
