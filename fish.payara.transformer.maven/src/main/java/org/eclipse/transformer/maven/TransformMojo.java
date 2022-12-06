@@ -9,14 +9,22 @@
  * SPDX-License-Identifier: (EPL-2.0 OR Apache-2.0)
  ********************************************************************************/
 
+// Copyright (c) 2020 Contributors to the Eclipse Foundation
+// Copyright (c) 2022 Payara Foundation and/or its affiliates
+
 package org.eclipse.transformer.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 import org.apache.maven.artifact.Artifact;
@@ -38,8 +46,16 @@ import org.eclipse.transformer.jakarta.JakartaTransformer;
  */
 @Mojo(name = "run", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true, threadSafe = true)
 public class TransformMojo extends AbstractMojo {
-    
-        private final static String TARGET_AS_ORIGIN = "transformed";
+
+	private static final String OUTPUT_PREFIX = "output_";
+
+	private final static String TARGET_AS_ORIGIN = "transformed";
+
+	private static final String SELECTED_SOURCE = "selectedSource";
+
+	private static final String SELECTED_TARGET= "selectedTarget";
+
+	private final static Logger log = Logger.getLogger(TransformMojo.class.getName());
 
 	@Parameter(defaultValue = "${project}", readonly = true, required = true)
 	private MavenProject		project;
@@ -49,10 +65,10 @@ public class TransformMojo extends AbstractMojo {
 
 	@Parameter(defaultValue = "true", property = "transformer-plugin.overwrite", required = true)
 	private Boolean				overwrite;
-        
+
 	@Parameter(defaultValue = "true", property = "transformer-plugin.mainSource", required = true)
 	private Boolean				mainSource;
-        
+
 	@Parameter(defaultValue = "true", property = "transformer-plugin.testSource", required = true)
 	private Boolean				testSource;
 
@@ -71,12 +87,18 @@ public class TransformMojo extends AbstractMojo {
 	@Parameter(property = "transformer-plugin.per-class-constant", defaultValue = "")
 	private String rulesPerClassConstantUri;
 
+	@Parameter(property = "transformer-plugin.selectedSource", defaultValue = "")
+	private String selectedSource;
+
+	@Parameter(property = "transformer-plugin.selectedTarget", defaultValue = "")
+	private String selectedTarget;
+
 	@Parameter(property = "transformer-plugin.xml", defaultValue = "")
 	private String				rulesXmlsUri;
 
 	@Parameter(defaultValue = TARGET_AS_ORIGIN)
 	private String				classifier;
-        
+
 	@Parameter(defaultValue = "${project.build.directory}", required = true)
 	private File				outputDirectory;
 
@@ -113,7 +135,7 @@ public class TransformMojo extends AbstractMojo {
 	 * transformer provided. The transformed artifact is attached to the
 	 * project.
 	 *
-	 * @param transformer The Transformer to use for the transformation
+	 * @param transformer    The Transformer to use for the transformation
 	 * @param sourceArtifact The Artifact to transform
 	 * @throws MojoFailureException if plugin execution fails
 	 */
@@ -126,42 +148,78 @@ public class TransformMojo extends AbstractMojo {
 		final File targetFile = new File(outputDirectory, sourceArtifact.getArtifactId() + "-" + targetClassifier + "-"
 			+ sourceArtifact.getVersion() + "." + sourceArtifact.getType());
 
-		final List<String> args = new ArrayList<>();
-		args.add(sourceArtifact.getFile()
-			.getAbsolutePath());
-                args.add(targetFile.getAbsolutePath());
-
-		if (this.overwrite) {
-			args.add("-o");
-		}
-                if(this.invert) {
-                	args.add("-i");
-		}
+		//processing new parameters to select source file and target directory to execute transform operation
+		// from maven command line
+		log.info("Processing custom parameters for source and target file");
+		List<String> args = processCustomParameters(sourceArtifact, targetFile);
 
 		transformer.setArgs(args.toArray(new String[0]));
+		log.info("configured Args:" + args);
 		int rc = transformer.run();
 
 		if (rc != 0) {
 			throw new MojoFailureException("Transformer failed with an error: " + Transformer.RC_DESCRIPTIONS[rc]);
 		}
 
-                if(TARGET_AS_ORIGIN.equals(classifier)) {
-                    try {
-                        if(sourceArtifact.getFile().isDirectory()) {
-                            FileUtils.deleteDirectory(sourceArtifact.getFile());
-                        } else {
-                            targetFile.delete();
-                        }
-                        targetFile.renameTo(sourceArtifact.getFile());
-                    } catch (IOException ex) {
-                        throw new MojoFailureException("Transformer failed", ex);
-                    }
-                } else {
-                        projectHelper.attachArtifact(project, sourceArtifact.getType(), targetClassifier, targetFile);
-                }
+		if (TARGET_AS_ORIGIN.equals(classifier)) {
+			try {
+				if (sourceArtifact.getFile().isDirectory()) {
+					FileUtils.deleteDirectory(sourceArtifact.getFile());
+				} else {
+					targetFile.delete();
+				}
+				targetFile.renameTo(sourceArtifact.getFile());
+			} catch (IOException ex) {
+				throw new MojoFailureException("Transformer failed", ex);
+			}
+		} else {
+			projectHelper.attachArtifact(project, sourceArtifact.getType(), targetClassifier, targetFile);
+		}
 	}
-        
-        public void transform(final Transformer transformer, final File source) throws MojoFailureException {
+
+	/**
+	 * This method verifies if the custom parameter selectedSource and selectedTargetDirectory
+	 * were set on the command line
+	 * @param sourceArtifact resource type for the processing
+	 * @param targetFile target file used for the transform operation
+	 * @return
+	 */
+	private List<String> processCustomParameters(Artifact sourceArtifact, File targetFile){
+		Properties properties = System.getProperties();
+		final List<String> args = new ArrayList<>();
+		selectedSource = properties.getProperty(SELECTED_SOURCE);
+		if (selectedSource != null && !selectedSource.isEmpty()) {
+			log.info("setting custom source file:" + selectedSource);
+			args.add(selectedSource);
+
+			selectedTarget = properties.getProperty(SELECTED_TARGET);
+			if (selectedTarget != null && !selectedTarget.isEmpty()) {
+				log.info("setting custom target file:" + selectedTarget);
+				if(!Files.isDirectory(Paths.get(selectedSource)) && Files.isDirectory(Paths.get(selectedTarget))) {
+					String fileName = Paths.get(selectedSource).getFileName().toString();
+					String newFileName = new StringBuilder().append(selectedTarget)
+						.append(FileSystems.getDefault().getSeparator())
+						.append(OUTPUT_PREFIX).append(fileName).toString();
+					args.add(newFileName);
+				} else {
+					args.add(selectedTarget);
+				}
+			}
+		} else {
+			args.add(sourceArtifact.getFile().getAbsolutePath());
+			args.add(targetFile.getAbsolutePath());
+			if (this.overwrite) {
+				args.add("-o");
+			}
+			if (this.invert) {
+				args.add("-i");
+			}
+
+		}
+		return args;
+	}
+
+	public void transform(final Transformer transformer, final File source) throws MojoFailureException {
 
 		final String targetClassifier = this.classifier;
 
@@ -169,30 +227,30 @@ public class TransformMojo extends AbstractMojo {
 
 		final List<String> args = new ArrayList<>();
 		args.add(source.getAbsolutePath());
-                args.add(targetDirectory.getAbsolutePath());
+		args.add(targetDirectory.getAbsolutePath());
 
 		if (this.overwrite) {
 			args.add("-o");
 		}
-                if(this.invert) {
-                	args.add("-i");
+		if (this.invert) {
+			args.add("-i");
 		}
 
 		transformer.setArgs(args.toArray(new String[0]));
 		int rc = transformer.run();
 
-                if(TARGET_AS_ORIGIN.equals(classifier)) {
-                    try {
-                        if (source.isDirectory()) {
-                            FileUtils.deleteDirectory(source);
-                        } else {
-                            source.delete();
-                        }
-                        targetDirectory.renameTo(source);
-                    } catch (IOException ex) {
-                        throw new MojoFailureException("Transformer failed", ex);
-                    }
-                }
+		if (TARGET_AS_ORIGIN.equals(classifier)) {
+			try {
+				if (source.isDirectory()) {
+					FileUtils.deleteDirectory(source);
+				} else {
+					source.delete();
+				}
+				targetDirectory.renameTo(source);
+			} catch (IOException ex) {
+				throw new MojoFailureException("Transformer failed", ex);
+			}
+		}
 		if (rc != 0) {
 			throw new MojoFailureException("Transformer failed with an error: " + Transformer.RC_DESCRIPTIONS[rc]);
 		}
@@ -277,7 +335,43 @@ public class TransformMojo extends AbstractMojo {
 		this.overwrite = overwrite;
 	}
 
+	public void setInvert(Boolean invert) {
+		this.invert = invert;
+	}
+
 	void setOutputDirectory(File outputDirectory) {
 		this.outputDirectory = outputDirectory;
+	}
+
+	public void setSelectedSource(String selectedSource) {
+		this.selectedSource = selectedSource;
+	}
+
+	public void setSelectedTarget(String selectedTarget) {
+		this.selectedTarget = selectedTarget;
+	}
+
+	public String getSelectedSource() {
+		return selectedSource;
+	}
+
+	public String getSelectedTarget() {
+		return selectedTarget;
+	}
+
+	public void setMainSource(Boolean mainSource) {
+		this.mainSource = mainSource;
+	}
+
+	public Boolean getMainSource() {
+		return mainSource;
+	}
+
+	public Boolean getTestSource() {
+		return testSource;
+	}
+
+	public void setTestSource(Boolean testSource) {
+		this.testSource = testSource;
 	}
 }
