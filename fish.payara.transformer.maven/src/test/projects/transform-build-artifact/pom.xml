@@ -9,6 +9,10 @@
 	*
 	* SPDX-License-Identifier: (EPL-2.0 OR Apache-2.0)
 -->
+<!--
+	* Copyright (c) 2020 Contributors to the Eclipse Foundation
+	* Copyright (c) 2022 Payara Foundation and/or its affiliates
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -42,7 +46,7 @@
             <plugin>
                 <groupId>fish.payara.transformer</groupId>
                 <artifactId>fish.payara.transformer.maven</artifactId>
-                <version>0.2.10-SNAPSHOT</version>
+                <version>0.2.10</version>
                 <configuration>
 
                 </configuration>
