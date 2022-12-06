@@ -335,6 +335,10 @@ public class TransformMojo extends AbstractMojo {
 		this.overwrite = overwrite;
 	}
 
+	public void setInvert(Boolean invert) {
+		this.invert = invert;
+	}
+
 	void setOutputDirectory(File outputDirectory) {
 		this.outputDirectory = outputDirectory;
 	}
@@ -345,5 +349,29 @@ public class TransformMojo extends AbstractMojo {
 
 	public void setSelectedTarget(String selectedTarget) {
 		this.selectedTarget = selectedTarget;
+	}
+
+	public String getSelectedSource() {
+		return selectedSource;
+	}
+
+	public String getSelectedTarget() {
+		return selectedTarget;
+	}
+
+	public void setMainSource(Boolean mainSource) {
+		this.mainSource = mainSource;
+	}
+
+	public Boolean getMainSource() {
+		return mainSource;
+	}
+
+	public Boolean getTestSource() {
+		return testSource;
+	}
+
+	public void setTestSource(Boolean testSource) {
+		this.testSource = testSource;
 	}
 }

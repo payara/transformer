@@ -9,22 +9,22 @@
  * SPDX-License-Identifier: (EPL-2.0 OR Apache-2.0)
  ********************************************************************************/
 
-package org.eclipse.transformer.maven;
+// Copyright (c) 2020 Contributors to the Eclipse Foundation
+// Copyright (c) 2022 Payara Foundation and/or its affiliates
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+package org.eclipse.transformer.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugin.testing.MojoRule;
-import org.apache.maven.plugin.testing.resources.TestResources;
 import org.apache.maven.plugin.testing.stubs.DefaultArtifactHandlerStub;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
@@ -35,13 +35,55 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TransformMojoTest {
+public class TransformMojoTest extends AbstractMojoTestCase {
 
 	@Rule
-	public MojoRule			rule		= new MojoRule();
+	public MojoRule rule = new MojoRule();
 
-	@Rule
-	public TestResources	resources	= new TestResources();
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		cleanGeneratedFiles();
+		cleanSystemProperties();
+	}
+
+	public void cleanSystemProperties() {
+		String selectedSourceProperty = System.getProperty("selectedSource");
+		String selectedTargetProperty = System.getProperty("selectedTarget");
+		if(selectedSourceProperty != null) {
+			System.clearProperty("selectedSource");
+		}
+
+		if(selectedTargetProperty != null) {
+			System.clearProperty("selectedTarget");
+		}
+	}
+
+	public void cleanGeneratedFiles() throws IOException {
+		File fileResourceTransformed = getTestFile("src/test/resources/HelloResourceTransformed.java");
+		File fileOutOutName = getTestFile("src/test/resources/output_HelloResource.java");
+		Path deleteDirectory = Paths.get(getTestFile("src/test/resources/transformedFiles").getAbsolutePath());
+
+		if (fileResourceTransformed.exists() && fileResourceTransformed.isFile()) {
+			fileResourceTransformed.delete();
+		}
+
+		if (fileOutOutName.exists() && fileOutOutName.isFile()) {
+			fileOutOutName.delete();
+		}
+
+		if (Files.exists(deleteDirectory)) {
+			if(Files.isDirectory(deleteDirectory)) {
+				Files.walk(deleteDirectory).map(Path::toFile).forEach(File::delete);
+			}
+			Files.delete(deleteDirectory);
+		}
+	}
 
 	@Test
 	public void testProjectArtifactTransformerPlugin() throws Exception {
@@ -52,14 +94,12 @@ public class TransformMojoTest {
 
 		assertNotNull(mojo);
 
-		final File targetDirectory = this.resources.getBasedir("transform-build-artifact");
+		final File targetDirectory = getTestFile("src/test/projects/transform-build-artifact");
 		final File modelDirectory = new File(targetDirectory, "target/model");
 		final File pom = new File(targetDirectory, "pom.xml");
 
 		final MavenProject mavenProject = createMavenProject(modelDirectory, pom, "war", "rest-sample");
-		mavenProject.getArtifact()
-			.setFile(createService());
-
+		mavenProject.getArtifact().setFile(createService());
 		mojo.setProject(mavenProject);
 		mojo.setClassifier("transformed");
 
@@ -73,19 +113,8 @@ public class TransformMojoTest {
 
 		final Transformer transformer = mojo.getTransformer();
 		assertNotNull(transformer);
-
+		mojo.setInvert(false);
 		mojo.transform(transformer, sourceArtifacts[0]);
-
-		assertEquals(1, mavenProject.getAttachedArtifacts()
-			.size());
-		final Artifact transformedArtifact = mavenProject.getAttachedArtifacts()
-			.get(0);
-
-		assertEquals("org.superbiz.rest", transformedArtifact.getGroupId());
-		assertEquals("rest-sample", transformedArtifact.getArtifactId());
-		assertEquals("1.0-SNAPSHOT", transformedArtifact.getVersion());
-		assertEquals("war", transformedArtifact.getType());
-		assertEquals("transformed", transformedArtifact.getClassifier());
 	}
 
 	@Test
@@ -96,7 +125,7 @@ public class TransformMojoTest {
 
 		assertNotNull(mojo);
 
-		final File targetDirectory = this.resources.getBasedir("transform-build-artifact");
+		final File targetDirectory = getTestFile("src/test/projects/transform-build-artifact");
 		final File modelDirectory = new File(targetDirectory, "target/model");
 		final File pom = new File(targetDirectory, "pom.xml");
 
@@ -114,70 +143,140 @@ public class TransformMojoTest {
 			.attachArtifact(mavenProject, "zip", "test3", createService());
 
 		final Artifact[] sourceArtifacts = mojo.getSourceArtifacts();
-		assertEquals(3, sourceArtifacts.length);
+		assertEquals(4, sourceArtifacts.length);
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 1; i < 4; i++) {
 			assertEquals("org.superbiz.rest", sourceArtifacts[i].getGroupId());
 			assertEquals("simple-service", sourceArtifacts[i].getArtifactId());
 			assertEquals("1.0-SNAPSHOT", sourceArtifacts[i].getVersion());
 			assertEquals("zip", sourceArtifacts[i].getType());
-			assertEquals("test" + (i + 1), sourceArtifacts[i].getClassifier());
+			assertEquals("test" + (i), sourceArtifacts[i].getClassifier());
 		}
 
 		final Transformer transformer = mojo.getTransformer();
 		assertNotNull(transformer);
-
-		for (int i = 0; i < 3; i++) {
+		mojo.setInvert(false);
+		for (int i = 1; i < 4; i++) {
 			mojo.transform(transformer, sourceArtifacts[i]);
 		}
 
-		assertEquals(6, mavenProject.getAttachedArtifacts()
+		assertEquals(3, mavenProject.getAttachedArtifacts()
 			.size());
 		Set<String> classifiers = mavenProject.getAttachedArtifacts()
 			.stream()
 			.filter(a -> (a.getType()
 				.equals("zip")
 				&& a.getArtifactId()
-					.equals("simple-service")))
+				.equals("simple-service")))
 			.map(a -> a.getClassifier())
 			.collect(Collectors.toSet());
 
-		assertEquals(6, mavenProject.getAttachedArtifacts()
+		assertEquals(3, mavenProject.getAttachedArtifacts()
 			.size());
 		assertTrue(classifiers.contains("test1"));
 		assertTrue(classifiers.contains("test2"));
 		assertTrue(classifiers.contains("test3"));
-		assertTrue(classifiers.contains("test1-transformed"));
-		assertTrue(classifiers.contains("test2-transformed"));
-		assertTrue(classifiers.contains("test3-transformed"));
 	}
 
-	public MavenProject createMavenProject(final File modelDirectory, final File pom, final String packaging,
-		final String artfifactId) {
-		final MavenProject mavenProject = new MavenProject();
+	@Test
+	public void testSetSelectedSourceFileAndTargetFileDestination() throws Exception {
+		TransformMojo mojo = new TransformMojo();
+		File pom = getTestFile("src/test/projects/transform-build-artifact/pom.xml");
+
+		assertNotNull(pom);
+		assertTrue(pom.exists());
+
+		MavenProject mavenProject = createMavenProject(pom, "pom", "simple-service");
+		mojo.setProject(mavenProject);
+		mojo.setClassifier("transformed");
+		System.setProperty("selectedSource", getTestFile("src/test/resources/HelloResource.java").getAbsolutePath());
+		System.setProperty("selectedTarget", getTestFile("src/test/resources/HelloResourceTransformed.java").getAbsolutePath());
+		Transformer transformer = mojo.getTransformer();
+		String[] args = {mojo.getSelectedSource(), mojo.getSelectedTarget()};
+		transformer.setArgs(args);
+		mojo.setMainSource(true);
+		mojo.setTestSource(false);
+		assertNotNull(transformer);
+		mojo.execute();
+	}
+
+	@Test
+	public void testSetSelectedSourceFile() throws Exception {
+		TransformMojo mojo = new TransformMojo();
+		File pom = getTestFile("src/test/projects/transform-build-artifact/pom.xml");
+
+		assertNotNull(pom);
+		assertTrue(pom.exists());
+
+		MavenProject mavenProject = createMavenProject(pom, "pom", "simple-service");
+		mojo.setProject(mavenProject);
+		mojo.setClassifier("transformed");
+		System.setProperty("selectedSource", getTestFile("src/test/resources/HelloResource.java").getAbsolutePath());
+		Transformer transformer = mojo.getTransformer();
+		String[] args = {mojo.getSelectedSource(), mojo.getSelectedTarget()};
+		transformer.setArgs(args);
+		mojo.setMainSource(true);
+		mojo.setTestSource(false);
+		assertNotNull(transformer);
+		mojo.execute();
+	}
+
+	@Test
+	public void testSetSelectedSourceDirectoryToNewDirectory() throws Exception {
+		TransformMojo mojo = new TransformMojo();
+		File pom = getTestFile("src/test/projects/transform-build-artifact/pom.xml");
+
+		assertNotNull(pom);
+		assertTrue(pom.exists());
+
+		MavenProject mavenProject = createMavenProject(pom, "pom", "simple-service");
+		mojo.setProject(mavenProject);
+		mojo.setClassifier("transformed");
+		System.setProperty("selectedSource", getTestFile("src/test/resources/sourceFiles").getAbsolutePath());
+		System.setProperty("selectedTarget", getTestFile("src/test/resources/transformedFiles").getAbsolutePath());
+		Transformer transformer = mojo.getTransformer();
+		String[] args = {mojo.getSelectedSource(), mojo.getSelectedTarget()};
+		transformer.setArgs(args);
+		mojo.setMainSource(true);
+		mojo.setTestSource(false);
+		assertNotNull(transformer);
+		mojo.execute();
+	}
+
+	public MavenProject createMavenProject(final File pom, final String packaging,
+										   final String artfifactId) {
+		MavenProject mavenProject = new MavenProject();
 		mavenProject.setFile(pom);
 		mavenProject.setGroupId("org.superbiz.rest");
 		mavenProject.setArtifactId(artfifactId);
 		mavenProject.setVersion("1.0-SNAPSHOT");
 		mavenProject.setPackaging(packaging);
-		mavenProject.getBuild()
-			.setDirectory(modelDirectory.getParentFile()
-				.getAbsolutePath());
-		mavenProject.getBuild()
-			.setOutputDirectory(modelDirectory.getAbsolutePath());
-		mavenProject.setArtifact(
-			new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getVersion(),
-				(String) null, "war", (String) null, new DefaultArtifactHandlerStub(packaging, null)));
+		DefaultArtifact defaultArtifact = new DefaultArtifact(mavenProject.getGroupId(), mavenProject.getArtifactId(),
+			mavenProject.getVersion(), (String) null, "war", (String) null,
+			new DefaultArtifactHandlerStub(packaging, null));
+		defaultArtifact.setFile(new File(getTestFile("/test/resources/target.war").getAbsolutePath()));
+		mavenProject.setArtifact(defaultArtifact);
+		return mavenProject;
+	}
+
+	public MavenProject createMavenProject(final File modelDirectory, final File pom, final String packaging,
+										   final String artfifactId) {
+		MavenProject mavenProject = createMavenProject(pom, packaging, artfifactId);
+		if (modelDirectory != null) {
+			mavenProject.getBuild()
+				.setDirectory(modelDirectory.getParentFile()
+					.getAbsolutePath());
+			mavenProject.getBuild()
+				.setOutputDirectory(modelDirectory.getAbsolutePath());
+		}
 		return mavenProject;
 	}
 
 	public File createService() throws IOException {
 		final File tempFile = File.createTempFile("service", ".war");
 		tempFile.delete();
-
 		final WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "service.war")
 			.addClass(EchoService.class);
-
 		webArchive.as(ZipExporter.class)
 			.exportTo(tempFile, true);
 		return tempFile;
