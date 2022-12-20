@@ -205,6 +205,12 @@ public class TransformMojo extends AbstractMojo {
 					args.add(selectedTarget);
 				}
 			}
+			if (this.overwrite) {
+				args.add("-o");
+			}
+			if (this.invert) {
+				args.add("-i");
+			}
 		} else {
 			args.add(sourceArtifact.getFile().getAbsolutePath());
 			args.add(targetFile.getAbsolutePath());

@@ -50,6 +50,7 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		super.tearDown();
 		cleanGeneratedFiles();
 		cleanSystemProperties();
+		deleteProcessDirectory();
 	}
 
 	public void cleanSystemProperties() {
@@ -196,6 +197,8 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		transformer.setArgs(args);
 		mojo.setMainSource(true);
 		mojo.setTestSource(false);
+		mojo.setInvert(false);
+		mojo.setOverwrite(true);
 		assertNotNull(transformer);
 		mojo.execute();
 	}
@@ -217,6 +220,8 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		transformer.setArgs(args);
 		mojo.setMainSource(true);
 		mojo.setTestSource(false);
+		mojo.setInvert(false);
+		mojo.setOverwrite(true);
 		assertNotNull(transformer);
 		mojo.execute();
 	}
@@ -239,9 +244,66 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		transformer.setArgs(args);
 		mojo.setMainSource(true);
 		mojo.setTestSource(false);
+		mojo.setInvert(false);
+		mojo.setOverwrite(true);
 		assertNotNull(transformer);
 		mojo.execute();
 	}
+
+	@Test
+	public void testSelectecSourceDirectoryToSameDirectory() throws Exception {
+		TransformMojo mojo = new TransformMojo();
+		File pom = getTestFile("src/test/projects/transform-build-artifact/pom.xml");
+
+		assertNotNull(pom);
+		assertTrue(pom.exists());
+
+		MavenProject mavenProject = createMavenProject(pom, "pom", "simple-service");
+		mojo.setProject(mavenProject);
+		mojo.setClassifier("transformed");
+		createProcessDirectory();
+		System.setProperty("selectedSource", getTestFile("src/test/resources/processDirectory").getAbsolutePath());
+		System.setProperty("selectedTarget", getTestFile("src/test/resources/processDirectory").getAbsolutePath());
+		Transformer transformer = mojo.getTransformer();
+		String[] args = {mojo.getSelectedSource(), mojo.getSelectedTarget()};
+		transformer.setArgs(args);
+		mojo.setMainSource(true);
+		mojo.setTestSource(false);
+		mojo.setInvert(false);
+		mojo.setOverwrite(true);
+		assertNotNull(transformer);
+		mojo.execute();
+	}
+
+	public void createProcessDirectory() {
+		String sourceFile = getTestFile("src/test/resources/sourceFiles/HelloResource.java").getAbsolutePath();
+		Path path = Paths.get(sourceFile);
+		Path basePath = path.getParent().getParent();
+		//createDirectory
+		Path newDirectory = Paths.get(basePath.toAbsolutePath().toString(),"processDirectory");
+		Path targetFile = Paths.get(newDirectory.toAbsolutePath().toString(), "HelloResource.java");
+		if(!Files.exists(newDirectory)) {
+			try {
+				Files.createDirectory(newDirectory);
+				Files.copy(path, targetFile);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public void deleteProcessDirectory() {
+		Path processedFile = Paths.get("src/test/resources/processDirectory/HelloResource.java");
+		if(Files.exists(processedFile)) {
+			try {
+				Files.walk(processedFile.getParent()).map(Path::toFile).forEach(File::delete);
+				Files.delete(processedFile.getParent());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 
 	public MavenProject createMavenProject(final File pom, final String packaging,
 										   final String artfifactId) {

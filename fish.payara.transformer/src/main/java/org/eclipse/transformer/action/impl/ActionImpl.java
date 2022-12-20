@@ -15,6 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -594,20 +597,45 @@ public abstract class ActionImpl implements Action {
 		debug("Input [ {} ] Length [ {} ]", inputName, inputLength);
 
 		InputStream inputStream = openInputStream(inputFile);
+		Path temporalFile = null;
+		boolean isSameName = false;
 		try {
-			OutputStream outputStream = openOutputStream(outputFile);
+			OutputStream outputStream = null;
+
+			if(inputFile.getAbsolutePath().equals(outputFile.getAbsolutePath())) {
+				Path pathFromInput = Paths.get(inputFile.getAbsolutePath());
+				temporalFile = Files.createTempFile(pathFromInput.getParent(),null,null);
+				outputStream = openOutputStream(temporalFile.toFile());
+				isSameName = true;
+			} else {
+				outputStream = openOutputStream(outputFile);
+			}
 			try {
 				apply(inputName, inputStream, inputLength, outputStream);
 			} finally {
 				closeOutputStream(outputFile, outputStream);
 			}
+		} catch (IOException e) {
+			String message = String.format("Error when processing File: %s", e.getMessage());
+			logger.log(Level.SEVERE, message);
+			throw new TransformException(message, e);
 		} finally {
 			closeInputStream(inputFile, inputStream);
 		}
+		if(inputFile.exists() && isSameName) {
+			inputFile.delete();
+		}
+		if(temporalFile != null && temporalFile.toFile().exists()) {
+			Path pathFromInput = Paths.get(inputFile.getAbsolutePath());
+			try {
+				Files.move(temporalFile, pathFromInput);
+			} catch (IOException e) {
+				String message = String.format("Error when processing File: %s", e.getMessage());
+				logger.log(Level.SEVERE, message);
+				throw new TransformException(message, e);
+			}
+		}
 	}
-
-	//
-
 	protected InputStream openInputStream(File inputFile) throws TransformException {
 
 		try {
