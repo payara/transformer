@@ -9,6 +9,9 @@
  * SPDX-License-Identifier: (EPL-2.0 OR Apache-2.0)
  ********************************************************************************/
 
+// Copyright (c) 2020 Contributors to the Eclipse Foundation
+// Copyright (c) 2022 Payara Foundation and/or its affiliates
+
 package org.eclipse.transformer.action.impl;
 
 import java.io.File;

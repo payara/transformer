@@ -63,7 +63,7 @@
 
         <payara.version>6.2022.1.Alpha4</payara.version>
 
-        <fish.payara.transformer.payara.version>0.2.11-SNAPSHOT</fish.payara.transformer.payara.version>
+        <fish.payara.transformer.payara.version>0.2.10</fish.payara.transformer.payara.version>
         <deployment.transformer.api.version>1.2-SNAPSHOT</deployment.transformer.api.version>
         <deployment.transformer.impl.version>1.2-SNAPSHOT</deployment.transformer.impl.version>
     </properties>
