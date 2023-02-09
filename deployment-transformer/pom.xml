@@ -229,6 +229,9 @@
                         <configuration>
                             <Export-Package />
                             <instructions>
+								<Import-Package>
+									org.glassfish.api.admin;version="[6.0.0,7.0.0)"
+								</Import-Package>
                                 <_include>-osgi.bundle</_include>
                             </instructions>
                             <excludeDependencies>tools-jar</excludeDependencies>
@@ -242,6 +245,9 @@
                 <configuration>
                     <Export-Package />
                     <instructions>
+						<Import-Package>
+							org.glassfish.api.admin;version="[6.0.0,7.0.0)"
+						</Import-Package>
                         <_include>-osgi.bundle</_include>
                     </instructions>
                     <excludeDependencies>tools-jar</excludeDependencies>
