@@ -92,6 +92,8 @@
 							<instructions>
 								<Import-Package>
 									fish.payara.deployment.transformer.api.*;version=${deployment.transformer.api.version},
+									com.sun.enterprise.util.*;version="[6.0.0,7.0.0)",
+									org.glassfish.api.*;version="[6.0.0,7.0.0)",
 									*
 								</Import-Package>
 								<_include>-osgi.bundle</_include>
