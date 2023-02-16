@@ -66,4 +66,34 @@
         </dependency>
     </dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${maven-bundle-plugin.version}</version>
+				<configuration>
+					<supportedProjectTypes>
+						<supportedProjectType>jar</supportedProjectType>
+					</supportedProjectTypes>
+					<instructions>
+						<Export-Package>
+							fish.payara.deployment.transformer.api.*;version=${deployment.transformer.api.version}
+						</Export-Package>
+					</instructions>
+					<unpackBundle>true</unpackBundle>
+				</configuration>
+				<executions>
+					<execution>
+						<id>osgi-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

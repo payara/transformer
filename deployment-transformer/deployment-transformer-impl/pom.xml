@@ -74,4 +74,53 @@
         </dependency>
     </dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${maven-bundle-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>default-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+						<configuration>
+							<Export-Package />
+							<instructions>
+								<Import-Package>
+									fish.payara.deployment.transformer.api.*;version=${deployment.transformer.api.version},
+									*
+								</Import-Package>
+								<_include>-osgi.bundle</_include>
+							</instructions>
+							<excludeDependencies>tools-jar</excludeDependencies>
+							<supportedProjectTypes>
+								<supportedProjectType>glassfish-jar</supportedProjectType>
+								<supportedProjectType>jar</supportedProjectType>
+							</supportedProjectTypes>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<Export-Package />
+					<instructions>
+						<Import-Package>
+							fish.payara.deployment.transformer.api.*;version=${deployment.transformer.api.version},
+							*
+						</Import-Package>
+						<_include>-osgi.bundle</_include>
+					</instructions>
+					<excludeDependencies>tools-jar</excludeDependencies>
+					<supportedProjectTypes>
+						<supportedProjectType>glassfish-jar</supportedProjectType>
+						<supportedProjectType>jar</supportedProjectType>
+					</supportedProjectTypes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
