@@ -49,7 +49,7 @@
 
     <groupId>fish.payara.deployment.transformer</groupId>
     <artifactId>deployment-transformer-parent</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
 
     <packaging>pom</packaging>
 
@@ -65,8 +65,8 @@
 		<maven-bundle-plugin.version>4.1.0</maven-bundle-plugin.version>
 
         <fish.payara.transformer.payara.version>0.2.11</fish.payara.transformer.payara.version>
-        <deployment.transformer.api.version>1.2-SNAPSHOT</deployment.transformer.api.version>
-        <deployment.transformer.impl.version>1.2-SNAPSHOT</deployment.transformer.impl.version>
+        <deployment.transformer.api.version>1.2</deployment.transformer.api.version>
+        <deployment.transformer.impl.version>1.2</deployment.transformer.impl.version>
     </properties>
 
     <distributionManagement>
