@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2022 Payara Foundation and/or its affiliates. All rights reserved.
+    Copyright (c) 2022-2023 Payara Foundation and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -61,7 +61,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>fish.payara.server.internal.common</groupId>
+            <groupId>fish.payara.server.core.common</groupId>
             <artifactId>internal-api</artifactId>
         </dependency>
         <dependency>
@@ -73,5 +73,56 @@
             <artifactId>fish.payara.transformer.payara</artifactId>
         </dependency>
     </dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${maven-bundle-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>default-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+						<configuration>
+							<Export-Package />
+							<instructions>
+								<Import-Package>
+									fish.payara.deployment.transformer.api.*;version=${deployment.transformer.api.version},
+									com.sun.enterprise.util.*;version="[6.0.0,7.0.0)",
+									org.glassfish.api.*;version="[6.0.0,7.0.0)",
+									*
+								</Import-Package>
+								<_include>-osgi.bundle</_include>
+							</instructions>
+							<excludeDependencies>tools-jar</excludeDependencies>
+							<supportedProjectTypes>
+								<supportedProjectType>glassfish-jar</supportedProjectType>
+								<supportedProjectType>jar</supportedProjectType>
+							</supportedProjectTypes>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<Export-Package />
+					<instructions>
+						<Import-Package>
+							fish.payara.deployment.transformer.api.*;version=${deployment.transformer.api.version},
+							*
+						</Import-Package>
+						<_include>-osgi.bundle</_include>
+					</instructions>
+					<excludeDependencies>tools-jar</excludeDependencies>
+					<supportedProjectTypes>
+						<supportedProjectType>glassfish-jar</supportedProjectType>
+						<supportedProjectType>jar</supportedProjectType>
+					</supportedProjectTypes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
