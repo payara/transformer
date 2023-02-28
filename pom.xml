@@ -11,7 +11,7 @@
 -->
 <!--
 	* Copyright (c) 2020 Contributors to the Eclipse Foundation
-	* Copyright (c) 2022 Payara Foundation and/or its affiliates
+	* Copyright (c) 2022-2023 Payara Foundation and/or its affiliates
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -26,7 +26,7 @@
 	<version>${revision}</version>
 
 	<properties>
-		<revision>0.2.11</revision>
+		<revision>0.2.12-SNAPSHOT</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
