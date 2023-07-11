@@ -127,6 +127,8 @@ public class TransformMojo extends AbstractMojo {
                  if (testDirectory.exists()) {
                      transform(transformer, testDirectory);
                  }
+
+				 transform(transformer, Paths.get(project.getBuild().getSourceDirectory()).toFile());
              }
          }
 
@@ -151,7 +153,7 @@ public class TransformMojo extends AbstractMojo {
 		//processing new parameters to select source file and target directory to execute transform operation
 		// from maven command line
 		log.info("Processing custom parameters for source and target file");
-		List<String> args = processCustomParameters(sourceArtifact, targetFile);
+		List<String> args = processCustomParameters(sourceArtifact.getFile().getAbsolutePath(), targetFile.getAbsolutePath());
 
 		transformer.setArgs(args.toArray(new String[0]));
 		log.info("configured Args:" + args);
@@ -164,7 +166,9 @@ public class TransformMojo extends AbstractMojo {
 		if (TARGET_AS_ORIGIN.equals(classifier)) {
 			try {
 				if (sourceArtifact.getFile().isDirectory()) {
-					FileUtils.deleteDirectory(sourceArtifact.getFile());
+					if(!isSourceAndTargetEquals()) {
+						FileUtils.deleteDirectory(sourceArtifact.getFile());
+					}
 				} else {
 					targetFile.delete();
 				}
@@ -180,18 +184,17 @@ public class TransformMojo extends AbstractMojo {
 	/**
 	 * This method verifies if the custom parameter selectedSource and selectedTargetDirectory
 	 * were set on the command line
-	 * @param sourceArtifact resource type for the processing
-	 * @param targetFile target file used for the transform operation
+	 * @param sourcePath source path of the file to process
+	 * @param targetPath target path for the file to process
 	 * @return
 	 */
-	private List<String> processCustomParameters(Artifact sourceArtifact, File targetFile){
+	private List<String> processCustomParameters(String sourcePath, String targetPath){
 		Properties properties = System.getProperties();
 		final List<String> args = new ArrayList<>();
 		selectedSource = properties.getProperty(SELECTED_SOURCE);
 		if (selectedSource != null && !selectedSource.isEmpty()) {
 			log.info("setting custom source file:" + selectedSource);
 			args.add(selectedSource);
-
 			selectedTarget = properties.getProperty(SELECTED_TARGET);
 			if (selectedTarget != null && !selectedTarget.isEmpty()) {
 				log.info("setting custom target file:" + selectedTarget);
@@ -212,8 +215,8 @@ public class TransformMojo extends AbstractMojo {
 				args.add("-i");
 			}
 		} else {
-			args.add(sourceArtifact.getFile().getAbsolutePath());
-			args.add(targetFile.getAbsolutePath());
+			args.add(sourcePath);
+			args.add(targetPath);
 			if (this.overwrite) {
 				args.add("-o");
 			}
@@ -226,21 +229,12 @@ public class TransformMojo extends AbstractMojo {
 	}
 
 	public void transform(final Transformer transformer, final File source) throws MojoFailureException {
-
 		final String targetClassifier = this.classifier;
-
 		final File targetDirectory = new File(source + "-" + targetClassifier);
-
-		final List<String> args = new ArrayList<>();
-		args.add(source.getAbsolutePath());
-		args.add(targetDirectory.getAbsolutePath());
-
-		if (this.overwrite) {
-			args.add("-o");
-		}
-		if (this.invert) {
-			args.add("-i");
-		}
+		//processing new parameters to select source file and target directory to execute transform operation
+		// from maven command line
+		log.info("Processing custom parameters for source and target file");
+		List<String> args = processCustomParameters(source.getAbsolutePath(), targetDirectory.getAbsolutePath());
 
 		transformer.setArgs(args.toArray(new String[0]));
 		int rc = transformer.run();
@@ -248,7 +242,9 @@ public class TransformMojo extends AbstractMojo {
 		if (TARGET_AS_ORIGIN.equals(classifier)) {
 			try {
 				if (source.isDirectory()) {
-					FileUtils.deleteDirectory(source);
+					if(!isSourceAndTargetEquals()) {
+						FileUtils.deleteDirectory(source);
+					}
 				} else {
 					source.delete();
 				}
@@ -260,6 +256,13 @@ public class TransformMojo extends AbstractMojo {
 		if (rc != 0) {
 			throw new MojoFailureException("Transformer failed with an error: " + Transformer.RC_DESCRIPTIONS[rc]);
 		}
+	}
+
+	private boolean isSourceAndTargetEquals() {
+		Properties properties = System.getProperties();
+		String selectedSource = properties.getProperty(SELECTED_SOURCE);
+		String selectedTarget = properties.getProperty(SELECTED_TARGET);
+		return selectedSource != null && selectedTarget != null && selectedSource.equals(selectedTarget);
 	}
 
 	/**

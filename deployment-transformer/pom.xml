@@ -64,7 +64,7 @@
         <payara.version>6.2023.2</payara.version>
 		<maven-bundle-plugin.version>4.1.0</maven-bundle-plugin.version>
 
-        <fish.payara.transformer.payara.version>0.2.11</fish.payara.transformer.payara.version>
+        <fish.payara.transformer.payara.version>0.2.13</fish.payara.transformer.payara.version>
         <deployment.transformer.api.version>1.2</deployment.transformer.api.version>
         <deployment.transformer.impl.version>1.2</deployment.transformer.impl.version>
     </properties>
