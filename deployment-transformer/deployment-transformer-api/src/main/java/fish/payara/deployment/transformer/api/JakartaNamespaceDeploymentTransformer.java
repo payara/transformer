@@ -40,16 +40,22 @@
 package fish.payara.deployment.transformer.api;
 
 import org.glassfish.api.admin.AdminCommandContext;
+import org.glassfish.deployment.common.DeploymentException;
 import org.glassfish.hk2.classmodel.reflect.Types;
+import org.glassfish.internal.deployment.ExtendedDeploymentContext;
 
 import java.io.File;
 import java.io.IOException;
 
 public interface JakartaNamespaceDeploymentTransformer {
 
+	@Deprecated
     File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws IOException;
 
+	@Deprecated
     File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed, boolean invert) throws IOException;
+
+	File transformApplication(ExtendedDeploymentContext deploymentContext) throws IOException, DeploymentException;
 
     boolean isJakartaEEApplication(Types types);
 
