@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2020-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020-2023 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,11 +39,14 @@
  */
 package fish.payara.deployment.transformer;
 
+import com.sun.enterprise.config.serverbeans.ServerTags;
 import com.sun.enterprise.util.LocalStringManagerImpl;
 import fish.payara.deployment.transformer.api.JakartaNamespaceDeploymentTransformer;
 import org.eclipse.transformer.payara.JakartaNamespaceTransformer;
 import org.glassfish.api.admin.AdminCommandContext;
+import org.glassfish.deployment.common.DeploymentException;
 import org.glassfish.hk2.classmodel.reflect.Types;
+import org.glassfish.internal.deployment.ExtendedDeploymentContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,6 +106,31 @@ public class JakartaNamespaceDeploymentTransformerImpl implements JakartaNamespa
             return null;
         }
     }
+
+	public File transformApplication(ExtendedDeploymentContext extendedDeploymentContext) throws IOException, DeploymentException {
+		JakartaNamespaceTransformer transformer = new JakartaNamespaceTransformer(extendedDeploymentContext.getLogger(), extendedDeploymentContext.getSourceDir(), false);
+		int result = transformer.run();
+		if (result == SUCCESS_RC) {
+			File output = transformer.getOutput();
+			Path newPath = output.toPath();
+			if (!Boolean.getBoolean(extendedDeploymentContext.getAppProps().getProperty(ServerTags.DIRECTORY_DEPLOYED))) {
+				Files.walk(extendedDeploymentContext.getSourceDir().toPath())
+					.sorted(Comparator.reverseOrder())
+					.map(Path::toFile)
+					.forEach(File::delete);
+				newPath = Files.move(output.toPath(), extendedDeploymentContext.getSourceDir().toPath());
+				if (newPath == null) {
+					String msg = localStrings.getLocalString("application.namespace.transform.failed", "Application namespace transformation failed");
+					throw new DeploymentException(msg);
+				}
+			}
+			return newPath.toFile();
+		} else {
+			String msg = localStrings.getLocalString("application.namespace.transform.failed", "Application namespace transformation failed");
+			extendedDeploymentContext.getActionReport().failure(extendedDeploymentContext.getLogger(), msg);
+			return null;
+		}
+	}
 
     @Override
     public boolean isJakartaEEApplication(Types types) {
