@@ -163,12 +163,10 @@ public class TransformMojo extends AbstractMojo {
 			throw new MojoFailureException("Transformer failed with an error: " + Transformer.RC_DESCRIPTIONS[rc]);
 		}
 
-		if (TARGET_AS_ORIGIN.equals(classifier)) {
+		if (TARGET_AS_ORIGIN.equals(classifier) && !isSourceAndTargetAvailable()) {
 			try {
 				if (sourceArtifact.getFile().isDirectory()) {
-					if(!isSourceAndTargetEquals()) {
-						FileUtils.deleteDirectory(sourceArtifact.getFile());
-					}
+					FileUtils.deleteDirectory(sourceArtifact.getFile());
 				} else {
 					targetFile.delete();
 				}
@@ -239,12 +237,10 @@ public class TransformMojo extends AbstractMojo {
 		transformer.setArgs(args.toArray(new String[0]));
 		int rc = transformer.run();
 
-		if (TARGET_AS_ORIGIN.equals(classifier)) {
+		if (TARGET_AS_ORIGIN.equals(classifier) && !isSourceAndTargetAvailable()) {
 			try {
 				if (source.isDirectory()) {
-					if(!isSourceAndTargetEquals()) {
-						FileUtils.deleteDirectory(source);
-					}
+					FileUtils.deleteDirectory(source);
 				} else {
 					source.delete();
 				}
@@ -257,12 +253,11 @@ public class TransformMojo extends AbstractMojo {
 			throw new MojoFailureException("Transformer failed with an error: " + Transformer.RC_DESCRIPTIONS[rc]);
 		}
 	}
-
-	private boolean isSourceAndTargetEquals() {
+	private boolean isSourceAndTargetAvailable() {
 		Properties properties = System.getProperties();
 		String selectedSource = properties.getProperty(SELECTED_SOURCE);
 		String selectedTarget = properties.getProperty(SELECTED_TARGET);
-		return selectedSource != null && selectedTarget != null && selectedSource.equals(selectedTarget);
+		return selectedSource != null && selectedTarget != null;
 	}
 
 	/**
