@@ -26,7 +26,7 @@
 	<version>${revision}</version>
 
 	<properties>
-		<revision>0.2.13-SNAPSHOT</revision>
+		<revision>0.2.14-SNAPSHOT</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
