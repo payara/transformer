@@ -46,7 +46,7 @@
             <plugin>
                 <groupId>fish.payara.transformer</groupId>
                 <artifactId>fish.payara.transformer.maven</artifactId>
-                <version>0.2.14</version>
+                <version>0.2.15-SNAPSHOT</version>
                 <configuration>
 
                 </configuration>
