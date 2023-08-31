@@ -10,7 +10,7 @@
  ********************************************************************************/
 
 // Copyright (c) 2020 Contributors to the Eclipse Foundation
-// Copyright (c) 2022 Payara Foundation and/or its affiliates
+// Copyright (c) 2022-2023 Payara Foundation and/or its affiliates
 
 package org.eclipse.transformer.maven;
 
