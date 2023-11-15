@@ -10,7 +10,7 @@
  ********************************************************************************/
 
 // Copyright (c) 2020 Contributors to the Eclipse Foundation
-// Copyright (c) 2022 Payara Foundation and/or its affiliates
+// Copyright (c) 2022-2023 Payara Foundation and/or its affiliates
 
 package org.eclipse.transformer.maven;
 
@@ -19,10 +19,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.model.Build;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugin.testing.MojoRule;
 import org.apache.maven.plugin.testing.stubs.DefaultArtifactHandlerStub;
@@ -188,6 +190,10 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		assertTrue(pom.exists());
 
 		MavenProject mavenProject = createMavenProject(pom, "pom", "simple-service");
+		Build build = createBuild();
+		mavenProject.setBuild(build);
+		MavenProjectHelper mavenProjectHelper = new ProjectHelper();
+		mojo.setProjectHelper(mavenProjectHelper);
 		mojo.setProject(mavenProject);
 		mojo.setClassifier("transformed");
 		System.setProperty("selectedSource", getTestFile("src/test/resources/HelloResource.java").getAbsolutePath());
@@ -195,8 +201,8 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		Transformer transformer = mojo.getTransformer();
 		String[] args = {mojo.getSelectedSource(), mojo.getSelectedTarget()};
 		transformer.setArgs(args);
-		mojo.setMainSource(true);
-		mojo.setTestSource(false);
+		mojo.setMainSource(false);
+		mojo.setTestSource(true);
 		mojo.setInvert(false);
 		mojo.setOverwrite(true);
 		assertNotNull(transformer);
@@ -235,6 +241,10 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		assertTrue(pom.exists());
 
 		MavenProject mavenProject = createMavenProject(pom, "pom", "simple-service");
+		Build build = createBuild();
+		mavenProject.setBuild(build);
+		MavenProjectHelper mavenProjectHelper = new ProjectHelper();
+		mojo.setProjectHelper(mavenProjectHelper);
 		mojo.setProject(mavenProject);
 		mojo.setClassifier("transformed");
 		System.setProperty("selectedSource", getTestFile("src/test/resources/sourceFiles").getAbsolutePath());
@@ -242,8 +252,8 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		Transformer transformer = mojo.getTransformer();
 		String[] args = {mojo.getSelectedSource(), mojo.getSelectedTarget()};
 		transformer.setArgs(args);
-		mojo.setMainSource(true);
-		mojo.setTestSource(false);
+		mojo.setMainSource(false);
+		mojo.setTestSource(true);
 		mojo.setInvert(false);
 		mojo.setOverwrite(true);
 		assertNotNull(transformer);
@@ -259,6 +269,10 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		assertTrue(pom.exists());
 
 		MavenProject mavenProject = createMavenProject(pom, "pom", "simple-service");
+		Build build = createBuild();
+		mavenProject.setBuild(build);
+		MavenProjectHelper mavenProjectHelper = new ProjectHelper();
+		mojo.setProjectHelper(mavenProjectHelper);
 		mojo.setProject(mavenProject);
 		mojo.setClassifier("transformed");
 		createProcessDirectory();
@@ -267,8 +281,8 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		Transformer transformer = mojo.getTransformer();
 		String[] args = {mojo.getSelectedSource(), mojo.getSelectedTarget()};
 		transformer.setArgs(args);
-		mojo.setMainSource(true);
-		mojo.setTestSource(false);
+		mojo.setMainSource(false);
+		mojo.setTestSource(true);
 		mojo.setInvert(false);
 		mojo.setOverwrite(true);
 		assertNotNull(transformer);
@@ -334,6 +348,13 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		return mavenProject;
 	}
 
+	public Build createBuild() {
+		Build build = new Build();
+		build.setTestOutputDirectory("src/temp");
+		build.setSourceDirectory("src/test");
+		return build;
+	}
+
 	public File createService() throws IOException {
 		final File tempFile = File.createTempFile("service", ".war");
 		tempFile.delete();
@@ -342,5 +363,33 @@ public class TransformMojoTest extends AbstractMojoTestCase {
 		webArchive.as(ZipExporter.class)
 			.exportTo(tempFile, true);
 		return tempFile;
+	}
+
+	class ProjectHelper implements MavenProjectHelper {
+
+		@Override
+		public void attachArtifact(MavenProject mavenProject, File file, String s) {
+
+		}
+
+		@Override
+		public void attachArtifact(MavenProject mavenProject, String s, File file) {
+
+		}
+
+		@Override
+		public void attachArtifact(MavenProject mavenProject, String s, String s1, File file) {
+
+		}
+
+		@Override
+		public void addResource(MavenProject mavenProject, String s, List<String> list, List<String> list1) {
+
+		}
+
+		@Override
+		public void addTestResource(MavenProject mavenProject, String s, List<String> list, List<String> list1) {
+
+		}
 	}
 }
