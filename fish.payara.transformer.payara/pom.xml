@@ -143,13 +143,13 @@
         <repository>
             <id>payara-nexus-artifacts</id>
             <name>Payara Nexus Artifacts</name>
-            <url>https://nexus.payara.fish/content/repositories/payara-artifacts</url>
+            <url>https://nexus.dev.payara.fish/content/repositories/payara-artifacts</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
             <id>payara-nexus-artifacts</id>
-            <url>https://nexus.payara.fish/repository/payara-artifacts</url>
+            <url>https://nexus.dev.payara.fish/repository/payara-artifacts</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
