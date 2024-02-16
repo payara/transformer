@@ -78,12 +78,12 @@
         <repository>
             <id>payara-nexus-artifacts</id>
             <name>Payara Nexus Artifacts</name>
-            <url>https://nexus.dev.payara.fish/content/repositories/payara-artifacts</url>
+            <url>https://nexus.dev.payara.fish/repository/payara-artifacts</url>
         </repository>
 		<snapshotRepository>
 			<id>payara-nexus-snapshots</id>
 			<name>Payara Nexus Snapshots</name>
-			<url>https://nexus.dev.payara.fish/content/repositories/payara-snapshots</url>
+			<url>https://nexus.dev.payara.fish/repository/payara-snapshots</url>
 		</snapshotRepository>
     </distributionManagement>
 
