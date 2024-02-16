@@ -75,6 +75,11 @@
             <name>Payara Nexus Artifacts</name>
             <url>https://nexus.dev.payara.fish/content/repositories/payara-artifacts</url>
         </repository>
+		<snapshotRepository>
+			<id>payara-nexus-snapshots</id>
+			<name>Payara Nexus Snapshots</name>
+			<url>https://nexus.dev.payara.fish/content/repositories/payara-snapshots</url>
+		</snapshotRepository>
     </distributionManagement>
 
     <repositories>
@@ -88,6 +93,16 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+		<repository>
+			<id>payara-nexus-snapshots</id>
+			<url>https://nexus.dev.payara.fish/repository/payara-snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
     </repositories>
 
     <pluginRepositories>
@@ -101,18 +116,16 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
-        <!-- Needed for glassfishbuild-maven-plugin 3.2.20.payara-p2 -->
-        <pluginRepository>
-            <id>payara-patched-externals</id>
-            <name>Payara Patched Externals</name>
-            <url>https://raw.github.com/payara/Payara_PatchedProjects/master</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
+		<pluginRepository>
+			<id>payara-nexus-snapshots</id>
+			<url>https://nexus.dev.payara.fish/repository/payara-snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
     </pluginRepositories>
 
     <modules>
