@@ -63,10 +63,15 @@
 
         <payara.version>6.2023.2</payara.version>
         <maven-bundle-plugin.version>4.1.0</maven-bundle-plugin.version>
+		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
 
         <fish.payara.transformer.payara.version>0.2.13</fish.payara.transformer.payara.version>
         <deployment.transformer.api.version>1.4-SNAPSHOT</deployment.transformer.api.version>
         <deployment.transformer.impl.version>1.4-SNAPSHOT</deployment.transformer.impl.version>
+
+		<javadoc.skip>false</javadoc.skip>
+		<source.skip>false</source.skip>
     </properties>
 
     <distributionManagement>
@@ -228,6 +233,24 @@
 						</supportedProjectTypes>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<detectOfflineLinks>false</detectOfflineLinks>
+						<skip>${javadoc.skip}</skip>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven-source-plugin.version}</version>
+					<configuration>
+						<includePom>true</includePom>
+						<skipSource>${source.skip}</skipSource>
+					</configuration>
+				</plugin>
             </plugins>
         </pluginManagement>
 
@@ -294,6 +317,31 @@
                     <versionPropertyName>project.osgi.version</versionPropertyName>
                 </configuration>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
 
