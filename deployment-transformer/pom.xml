@@ -63,7 +63,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <payara.version>6.2023.2</payara.version>
+        <payara.version>7.0.0-SNAPSHOT</payara.version>
         <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
 		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
@@ -220,12 +220,6 @@
 					<version>${maven-bundle-plugin.version}</version>
 					<configuration>
 						<instructions>
-							<Import-Package>
-								org.glassfish.api.admin;version="[6.0.0,7.0.0]",
-								org.glassfish.deployment.common;version="[6.0.0,7.0.0]",
-								org.glassfish.internal.deployment;version="[6.0.0,7.0.0]",
-								*
-							</Import-Package>
 							<_include>-osgi.bundle</_include>
 						</instructions>
 						<excludeDependencies>tools-jar</excludeDependencies>
