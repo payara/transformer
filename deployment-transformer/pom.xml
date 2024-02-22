@@ -64,7 +64,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <payara.version>6.2023.2</payara.version>
-        <maven-bundle-plugin.version>4.1.0</maven-bundle-plugin.version>
+        <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
 		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
 
@@ -269,7 +269,7 @@
             <plugin>
                 <groupId>org.glassfish.hk2</groupId>
                 <artifactId>hk2-inhabitant-generator</artifactId>
-                <version>2.6.1.payara-p1</version>
+                <version>3.0.6</version>
                 <executions>
                     <execution>
                         <goals>
@@ -304,7 +304,7 @@
             <plugin>
                 <groupId>org.glassfish.hk2</groupId>
                 <artifactId>osgiversion-maven-plugin</artifactId>
-                <version>2.6.1.payara-p1</version>
+                <version>3.0.6</version>
                 <executions>
                     <execution>
                         <id>default-compute-osgi-version</id>
