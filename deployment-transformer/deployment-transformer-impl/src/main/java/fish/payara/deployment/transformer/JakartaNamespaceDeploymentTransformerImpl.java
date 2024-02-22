@@ -73,40 +73,6 @@ public class JakartaNamespaceDeploymentTransformerImpl implements JakartaNamespa
             "jakarta.persistence.Entity"
     };
 
-    @Override
-    public File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws
-            IOException {
-        return this.transformApplication(path, context, isDirectoryDeployed, false);
-    }
-
-    @Override
-    public File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed, boolean invert) throws
-            IOException {
-        JakartaNamespaceTransformer transformer = new JakartaNamespaceTransformer(context.getLogger(), path, invert);
-        int result = transformer.run();
-        if (result == SUCCESS_RC) {
-            File output = transformer.getOutput();
-            Path newPath = output.toPath();
-            if (!isDirectoryDeployed) {
-                Files.walk(path.toPath())
-                        .sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-                newPath = Files.move(output.toPath(), path.toPath());
-                if (newPath == null) {
-                    String msg = localStrings.getLocalString("application.namespace.transform.failed", "Application namespace transformation failed");
-                    context.getActionReport().failure(context.getLogger(), msg);
-                    return null;
-                }
-            }
-            return newPath.toFile();
-        } else {
-            String msg = localStrings.getLocalString("application.namespace.transform.failed", "Application namespace transformation failed");
-            context.getActionReport().failure(context.getLogger(), msg);
-            return null;
-        }
-    }
-
 	public File transformApplication(ExtendedDeploymentContext extendedDeploymentContext) throws IOException, DeploymentException {
 		JakartaNamespaceTransformer transformer = new JakartaNamespaceTransformer(extendedDeploymentContext.getLogger(), extendedDeploymentContext.getSourceDir(), false);
 		int result = transformer.run();

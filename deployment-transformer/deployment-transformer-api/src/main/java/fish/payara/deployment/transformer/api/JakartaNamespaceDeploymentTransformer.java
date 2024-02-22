@@ -49,12 +49,6 @@ import java.io.IOException;
 
 public interface JakartaNamespaceDeploymentTransformer {
 
-	@Deprecated
-    File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed) throws IOException;
-
-	@Deprecated
-    File transformApplication(File path, AdminCommandContext context, boolean isDirectoryDeployed, boolean invert) throws IOException;
-
 	File transformApplication(ExtendedDeploymentContext deploymentContext) throws IOException, DeploymentException;
 
     boolean isJakartaEEApplication(Types types);
