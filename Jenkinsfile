@@ -32,7 +32,7 @@ pipeline {
             steps {
                 script {
                     echo '*#*#*#*#*#*#*#*#*#*#*#*#  Building SRC  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#'
-                    sh """mvn -B -V -ff -e clean install --strict-checksums \
+                    sh """mvn -B -V -ff -e clean install -f deployment-transformer/pom.xml --strict-checksums \
                         -Djavadoc.skip -Dsource.skip"""
                     echo '*#*#*#*#*#*#*#*#*#*#*#*#    Built SRC   *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#'
                 }
